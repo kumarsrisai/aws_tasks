@@ -1,0 +1,51 @@
+name: Configure AWS Credentials and Deploy S3 Resources
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write  # Allow the workflow to request OIDC tokens
+  contents: read   # Allow the workflow to access the repository contents
+
+jobs:
+  configure-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4  # Latest version as of now
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4  # Latest version as of now
+        with:
+          role-to-assume: arn:aws:iam::014498661566:role/GHE-AWS-OIDC-ROLE
+          role-session-name: github-actions-session
+          aws-region: us-east-1
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3  # Latest version as of now
+        with:
+          terraform_version: 1.9.5  # Latest version as of now
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate    
+        run: terraform validate
+        
+      - name: Terraform Plan
+        run: Terraform plan 
+
+      - name: Terraform Apply 
+        run:  Terraform Apply
+
+#      - name: Terraform Destroy (S3 Only)
+#        run: terraform destroy -auto-approve \
+#             -target=aws_s3_bucket.bucket1 \
+#             -target=aws_s3_bucket.bucket2 \
+#             -target=aws_s3_bucket.bucket3 \
+#             -target=aws_s3_bucket.bucket4 \
+#             -target=aws_s3_bucket.bucket5 \
+#             -target=aws_s3_object.bucket1_folders
