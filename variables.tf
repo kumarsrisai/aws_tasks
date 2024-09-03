@@ -65,29 +65,29 @@ variable "role" {
 variable "s3_bucket1" {
   description = "name of the bucket1"
   type = string
-  default = "ddsl-raw-practice"
+  default = "ddsl-raw-dev1"
 }
 
 variable "s3_bucket2" {
   description = "name of the bucket2"
   type = string
-  default = "ddsl-raw-extended-practice"
+  default = "ddsl-raw-extended-dev1"
 }
 
 variable "s3_bucket3" {
   description = "name of the bucket3"
   type = string
-  default = "ddsl-dq-practice"
+  default = "ddsl-dq-dev1"
 }
 
 variable "s3_bucket4" {
   description = "name of the bucket4"
   type = string
-  default = "ddsl-procedded-practice"
+  default = "ddsl-procedded-dev1"
 }
 
 variable "s3_bucket5" {
   description = "name of the bucket5"
   type = string
-  default = "ddsl-odsl-domain-practice"
+  default = "ddsl-odsl-domain-dev1"
 }
