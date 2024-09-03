@@ -41,11 +41,5 @@ jobs:
       - name: Terraform Apply -auto-approve
         run: terraform apply -auto-approve
 
-      # - name: Terraform Destroy (S3 Only)
-      #   run: terraform destroy -auto-approve 
-#             -target=aws_s3_bucket.bucket1 \
-#             -target=aws_s3_bucket.bucket2 \
-#             -target=aws_s3_bucket.bucket3 \
-#             -target=aws_s3_bucket.bucket4 \
-#             -target=aws_s3_bucket.bucket5 \
-#             -target=aws_s3_object.bucket1_folders
+#      - name: Terraform Destroy -auto-approve
+#        run: terraform destroy -auto-approve
