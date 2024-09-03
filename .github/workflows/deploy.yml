@@ -38,8 +38,8 @@ jobs:
       - name: Terraform Plan
         run: terraform plan 
 
-      - name: Terraform Apply 
-        run: terraform Apply
+      - name: Terraform Apply -auto-approve
+        run: terraform Apply -auto-approve
 
 #      - name: Terraform Destroy (S3 Only)
 #        run: terraform destroy -auto-approve \
