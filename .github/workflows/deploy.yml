@@ -36,10 +36,10 @@ jobs:
         run: terraform validate
         
       - name: Terraform Plan
-        run: Terraform plan 
+        run: terraform plan 
 
       - name: Terraform Apply 
-        run:  Terraform Apply
+        run: terraform Apply
 
 #      - name: Terraform Destroy (S3 Only)
 #        run: terraform destroy -auto-approve \
