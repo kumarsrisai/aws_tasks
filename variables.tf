@@ -62,32 +62,32 @@ variable "region" {
 # }
 
 
-variable "s3_bucket1" {
-  description = "name of the bucket1"
-  type = string
-  default = "ddsl-raw-developer"
-}
+# variable "s3_bucket1" {
+#   description = "name of the bucket1"
+#   type = string
+#   default = "ddsl-raw-developer"
+# }
 
-variable "s3_bucket2" {
-  description = "name of the bucket2"
-  type = string
-  default = "ddsl-raw-extended-developer"
-}
+# variable "s3_bucket2" {
+#   description = "name of the bucket2"
+#   type = string
+#   default = "ddsl-raw-extended-developer"
+# }
 
-variable "s3_bucket3" {
-  description = "name of the bucket3"
-  type = string
-  default = "ddsl-dq-devloper"
-}
+# variable "s3_bucket3" {
+#   description = "name of the bucket3"
+#   type = string
+#   default = "ddsl-dq-devloper"
+# }
 
-variable "s3_bucket4" {
-  description = "name of the bucket4"
-  type = string
-  default = "ddsl-procedded-developer"
-}
+# variable "s3_bucket4" {
+#   description = "name of the bucket4"
+#   type = string
+#   default = "ddsl-procedded-developer"
+# }
 
-variable "s3_bucket5" {
-  description = "name of the bucket5"
-  type = string
-  default = "ddsl-odsl-domain-developer"
-}
+# variable "s3_bucket5" {
+#   description = "name of the bucket5"
+#   type = string
+#   default = "ddsl-odsl-domain-developer"
+# }
