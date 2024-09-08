@@ -288,3 +288,16 @@ resource "aws_s3_object" "s3_upload" {
   key    = each.value  
   source = "input_dir/${each.value}"
 }
+
+resource "aws_s3_bucket" "data_bucket" {
+  bucket = "ddsl-procedded-developer"
+  # other configuration options
+}
+
+resource "aws_security_group" "msk_sg" {
+  name        = "msk-security-group"
+  description = "Security group for MSK"
+  vpc_id      = "vpc-04a8de6dc2f812a42"
+
+  # Define your security group rules here
+}
