@@ -83,7 +83,7 @@ variable "s3_bucket3" {
 variable "s3_bucket4" {
   description = "name of the bucket4"
   type = string
-  default = "ddsl-procedded-developer"
+  default = "ddsl-processed-developer"
 }
 
 variable "s3_bucket5" {

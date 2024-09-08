@@ -4,7 +4,7 @@ resource "aws_athena_database" "example" {
 }
 
 resource "aws_athena_workgroup" "example" {
-  name = "primary"
+  name = "ddsl_athena_workgroup"
   configuration {
     enforce_workgroup_configuration = true
   }

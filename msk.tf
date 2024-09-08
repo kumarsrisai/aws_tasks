@@ -10,7 +10,7 @@ PROPERTIES
 resource "aws_msk_cluster" "example" {
   cluster_name           = "ddsl-kafka-dev"
   kafka_version          = "2.8.0"
-  number_of_broker_nodes = 3
+  number_of_broker_nodes = 4 
 
   broker_node_group_info {
     instance_type   = "kafka.m5.large"
