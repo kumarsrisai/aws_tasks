@@ -208,70 +208,71 @@ resource "aws_iam_policy_attachment" "eventbridge_policy_attachment" {
   })
 }
 
-#Stepfunction - Create IAM policy for AWS Step function
+# Stepfunction - Create IAM policy for AWS Step function
 resource "aws_iam_policy" "stepfunction_invoke_gluejob_policy" {
   name = "ddsl_stepfunction_dev_policy"
   policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-          "Sid" : "AllowCWAndGlueAccess",
-            "Effect": "Allow",
-            "Action": [                
-                "logs:CreateLogDelivery",
-                "logs:CreateLogStream",
-                "logs:GetLogDelivery",
-                "logs:UpdateLogDelivery",
-                "logs:DeleteLogDelivery",
-                "logs:ListLogDeliveries",
-                "logs:PutLogEvents",
-                "logs:PutResourcePolicy",
-                "logs:DescribeResourcePolicies",
-                "logs:DescribeLogGroups",
-                "glue:StartJobRun",
-                "glue:GetJobRun",
-                "glue:GetJobRuns",
-                "glue:BatchStopJobRun"   
-            ],
-            "Resource": "*"                     
-        },       
-        {
-          "Sid" : "AllowEventBridgeAccess",
-          "Effect": "Allow",
-          "Action": [
-                "events:PutTargets",
-                "events:PutRule",
-                "events:DescribeRule",
-                "events:PutEvents"                              
-            ],
-            "Resource": [
-               "arn:aws:events:${var.region}:${var.aws_account_id}:rule/s3_put_object_event"
-            ]
-        },
-        {
-          "Sid" : "AllowStateMachineAccess",
-            "Effect": "Allow",
-            "Action": [
-                "states:StartExecution",
-                "states:DescribeExecution",
-                "states:StopExecution"                              
-            ],                    
-            "Resource": [ 
-              "arn:aws:states:${var.region}:${var.aws_account_id}:stateMachine:ddsl-sfn-state-machine",
-              "arn:aws:states:${var.region}:${var.aws_account_id}:stateMachine:ddsl-sfn-state-machine-lineage",
-              ]    
-        }                
-     ]
-     tags = merge(var.tags,{
-      Name = lower(join("-", [var.appname, "statemachine", "role-policy", var.environment]))
-     })    
-})
+    "Version" = "2012-10-17",
+    "Statement" = [
+      {
+        "Sid" = "AllowCWAndGlueAccess",
+        "Effect" = "Allow",
+        "Action" = [
+          "logs:CreateLogDelivery",
+          "logs:CreateLogStream",
+          "logs:GetLogDelivery",
+          "logs:UpdateLogDelivery",
+          "logs:DeleteLogDelivery",
+          "logs:ListLogDeliveries",
+          "logs:PutLogEvents",
+          "logs:PutResourcePolicy",
+          "logs:DescribeResourcePolicies",
+          "logs:DescribeLogGroups",
+          "glue:StartJobRun",
+          "glue:GetJobRun",
+          "glue:GetJobRuns",
+          "glue:BatchStopJobRun"
+        ],
+        "Resource" = "*"
+      },
+      {
+        "Sid" = "AllowEventBridgeAccess",
+        "Effect" = "Allow",
+        "Action" = [
+          "events:PutTargets",
+          "events:PutRule",
+          "events:DescribeRule",
+          "events:PutEvents"
+        ],
+        "Resource" = [
+          "arn:aws:events:${var.region}:${var.aws_account_id}:rule/s3_put_object_event"
+        ]
+      },
+      {
+        "Sid" = "AllowStateMachineAccess",
+        "Effect" = "Allow",
+        "Action" = [
+          "states:StartExecution",
+          "states:DescribeExecution",
+          "states:StopExecution"
+        ],
+        "Resource" = [
+          "arn:aws:states:${var.region}:${var.aws_account_id}:stateMachine:ddsl-sfn-state-machine",
+          "arn:aws:states:${var.region}:${var.aws_account_id}:stateMachine:ddsl-sfn-state-machine-lineage"
+        ]
+      }
+    ]
+  })
+
+  tags = merge(var.tags, {
+    Name = lower(join("-", [var.appname, "statemachine", "role-policy", var.environment]))
+  })
 }
 
-#Stepfunction - AWS resource for stepfunction policy attachment
+# Stepfunction - AWS resource for stepfunction policy attachment
 resource "aws_iam_policy_attachment" "stepfunction_policy_attachment" {
-  name = "ddsl-stestepfunction-dev-policy-attachment"
-  roles = [aws_iam_role.iam_for_sfn.name]
+  name       = "ddsl-stestepfunction-dev-policy-attachment"
+  roles      = [aws_iam_role.iam_for_sfn.name]
   policy_arn = aws_iam_policy.stepfunction_invoke_gluejob_policy.arn
 }
 
