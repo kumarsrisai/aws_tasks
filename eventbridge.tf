@@ -27,7 +27,7 @@ resource "aws_cloudwatch_event_rule" "step_function_trigger_event_rule" {
         "detail-type": ["Object Created"],
         "detail":{
             "bucket": {
-                "name": ["${aws_s3_bucket.example1.id}"]
+                "name": ["${aws_s3_bucket.example1.name}"]
             }
         }
     }
