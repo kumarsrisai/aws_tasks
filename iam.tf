@@ -257,8 +257,8 @@ resource "aws_iam_policy" "stepfunction_invoke_gluejob_policy" {
           "states:StopExecution"
         ],
         "Resource" = [
-          "arn:aws:states:${var.region}:${var.aws_account_id}:stateMachine:ddsl-sfn-state-machine",
-          "arn:aws:states:${var.region}:${var.aws_account_id}:stateMachine:ddsl-sfn-state-machine-lineage"
+          # "arn:aws:states:${var.region}:${var.aws_account_id}:stateMachine:ddsl-sfn-state-machine-developer",
+          "arn:aws:states:${var.region}:${var.aws_account_id}:stateMachine:ddsl*"
         ]
       }
     ]
