@@ -322,6 +322,7 @@ resource "aws_s3_object" "s3_upload" {
   source = "input_dir/${each.value}"
 }
 
+
 # Check if the bucket already exists
 data "aws_s3_bucket" "existing_data_bucket" {
   count  = 1
@@ -334,6 +335,8 @@ resource "aws_s3_bucket" "data_bucket" {
   bucket = "ddsl-processed-developer"
   # other configuration options
 }
+
+
 
 resource "aws_security_group" "msk_sg" {
   name        = "msk-security-group"
