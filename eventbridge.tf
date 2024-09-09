@@ -55,7 +55,7 @@ resource "aws_cloudwatch_event_target" "cloudwatch_target" {
 }
 
 resource "aws_cloudwatch_event_permission" "allow_s3_cloudwatch_permission" {
-  principal      = "590183849298"
+  principal      = "014498661566"
   statement_id   = "AllowSameAccountRole"
   action         = "events:PutEvents"  
 }

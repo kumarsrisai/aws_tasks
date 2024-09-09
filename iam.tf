@@ -31,7 +31,7 @@ resource "aws_kms_key_policy" "ddsl_kms_policy" {
             ]
             "Condition": {
                 "ArnLike": {
-                    "kms:EncryptionContext:aws:logs:arn": "arn:aws:logs:ap-northeast-1:590183849298:*"
+                    "kms:EncryptionContext:aws:logs:arn": "arn:aws:logs:us-east-1:014498661566:*"
                 }
             }
                }    
@@ -114,21 +114,51 @@ resource "aws_iam_role" "eventbridge_role" {
 #Eventbridge - Creating a IAM Role policy for Eventbridge
 resource "aws_iam_role_policy" "eventbridge_policy" {
   role = aws_iam_role.eventbridge_role.id
+
   policy = jsonencode({
+    "Version": "2012-10-17",
     "Statement": [
-        {
-            "Action": [
-                "logs:CreateLogStream",
-                "logs:PutLogEvents"
-            ],
-            "Effect": "Allow",          
-            "Resource": "arn:aws:logs:ap-northeast-1:590183849298:log-group:/aws/events/eventbridgelogs:*",
-            "Sid": "TrustEventsToStoreLogEvent"
-        }
-    ],
-    "Version": "2012-10-17"
+      {
+        "Sid": "TrustEventsToStoreLogEvent",
+        "Effect": "Allow",
+        "Action": [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource": "arn:aws:logs:${var.region}:${var.aws_account_id}:log-group:/aws/events/eventbridgelogs:*"
+      },
+      {
+        "Sid": "AllowStepFunctionAccess",
+        "Effect": "Allow",
+        "Action": [
+          "states:StartExecution",
+          "events:PutTargets",
+          "events:PutRule",
+          "events:DescribeRule",
+          "events:PutEvents"
+        ],
+        "Resource": "arn:aws:states:*:*:stateMachine:*"
+      },
+      {
+        "Sid": "AllowCloudWatchAccess",
+        "Effect": "Allow",
+        "Action": [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:GetLogDelivery",
+          "logs:ListLogDeliveries",
+          "logs:PutResourcePolicies",
+          "logs:DescribeLogGroups",
+          "logs:CreateLogDelivery"
+        ],
+        "Resource": [
+          "arn:aws:logs:${var.region}:${var.aws_account_id}:log-group:/aws/events/eventbridge.logs:*"
+        ]
+      }
+    ]
   })
 }
+
 
 # Eventbridge - Create IAM policy for AWS Step Function to invoke-stepfunction-role-created-from-cloudwatch
 resource "aws_iam_policy" "policy_invoke_eventbridge" {
@@ -180,12 +210,12 @@ resource "aws_iam_policy_attachment" "eventbridge_policy_attachment" {
 
 #Stepfunction - Create IAM policy for AWS Step function
 resource "aws_iam_policy" "stepfunction_invoke_gluejob_policy" {
-  name = "tokyo_stepfunction_iam_policy"
-  policy = jsonencode(
-{
+  name = "ddsl_stepfunction_dev_policy"
+  policy = jsonencode({
     "Version": "2012-10-17",
     "Statement": [
         {
+          "Sid" : "AllowCWAndGlueAccess",
             "Effect": "Allow",
             "Action": [                
                 "logs:CreateLogDelivery",
@@ -206,33 +236,40 @@ resource "aws_iam_policy" "stepfunction_invoke_gluejob_policy" {
             "Resource": "*"                     
         },       
         {
-            "Effect": "Allow",
-            "Action": [
+          "Sid" : "AllowEventBridgeAccess",
+          "Effect": "Allow",
+          "Action": [
                 "events:PutTargets",
                 "events:PutRule",
                 "events:DescribeRule",
                 "events:PutEvents"                              
             ],
             "Resource": [
-               "arn:aws:events:ap-northeast-1:590183849298:rule/s3_put_object_event"
+               "arn:aws:events:${var.region}:${var.aws_account_id}:rule/s3_put_object_event"
             ]
         },
         {
+          "Sid" : "AllowStateMachineAccess",
             "Effect": "Allow",
             "Action": [
                 "states:StartExecution",
                 "states:DescribeExecution",
                 "states:StopExecution"                              
             ],                    
-            "Resource": [ "arn:aws:states:*:*:stateMachine:*" ]
-            
+            "Resource": [ 
+              "arn:aws:states:${var.region}:${var.aws_account_id}:stateMachine:ddsl-sfn-state-machine",
+              "arn:aws:states:${var.region}:${var.aws_account_id}:stateMachine:ddsl-sfn-state-machine-lineage",
+              ]    
         }                
-     ]    
+     ]
+     tags = merge(var.tags,{
+      name = local(join("-", [var.appname, "statemachine", "role-policy", var.environment]))
+     })    
 })
 }
 #Stepfunction - AWS resource for stepfunction policy attachment
 resource "aws_iam_policy_attachment" "stepfunction_policy_attachment" {
-  name = "stepfunction_policy"
+  name = "ddsl-stestepfunction-dev-policy-attachment"
   roles = [aws_iam_role.iam_for_sfn.name]
   policy_arn = aws_iam_policy.stepfunction_invoke_gluejob_policy.arn
 }
@@ -253,76 +290,171 @@ resource "aws_iam_role" "gluerole" {
     ]
   })
 }
+
 #AWS Glue -IAM Glue policy
-resource "aws_iam_policy" "gluepolicy" {
-  name = "gluepolicy"
-  policy = jsonencode(
-    {    
+resource "aws_iam_policy" "ddsl_glue_job_policy" {
+  name = "ddsl-glue-${var.environment}-policy"
+  
+  policy = jsonencode({
     "Version": "2012-10-17",
     "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "glue:*",                
-                "iam:ListRoles",
-                "iam:ListUsers",
-                "iam:ListGroups",
-                "iam:ListRolePolicies",
-                "iam:GetRole",
-                "iam:GetRolePolicy",
-                "iam:ListAttachedRolePolicies",     
-                "kms:ListAliases",
-                "kms:DescribeKey",   
-                "kms:Encrypt*",
-                "kms:Decrypt*",
-                "kms:GenerateDataKey"              
-            ],
-            "Resource": [
-                "*"
-            ]
-        },             
-        {
-            "Action": [
-                "s3:GetObject",
-                "s3:PutObject",
-                "s3:List*",
-                "s3:*Object*",
-                "s3:CopyObject"
-            ],
-            "Resource": [
-                "arn:aws:s3:::ddsl-rawdata-bucket/*",
-                "arn:aws:s3:::ddsl-extension-bucket/*",
-                "arn:aws:s3:::ddsl-dq1/*",
-                "arn:aws:s3:::ddsl-dq2/*"                          
-            ],
-            "Effect": "Allow"
-        },        
-        {
-            "Effect": "Allow",
-            "Action": [
-                "logs:GetLogEvents",
-                "logs:CreateLogGroup",
-                "logs:CreateLogStream",
-                "logs:PutLogEvents",
-                "logs:DescribeLogStreams"
-            ],
-            "Resource": [
-                "*"
-            ]
-        }                  
+      {
+        "Sid": "AllowGlueIAMKMSLogsAccess",
+        "Effect": "Allow",
+        "Action": [
+          "glue:CreateDatabase",
+          "glue:DeleteDatabase",
+          "glue:GetDatabase",
+          "glue:CreateTable",
+          "glue:UpdateTable",
+          "glue:DeleteTable",
+          "glue:GetTable",
+          "glue:GetTableVersion",
+          "glue:BatchCreatePartition",
+          "glue:BatchDeletePartition",
+          "glue:BatchUpdatePartition",
+          "iam:ListRoles",
+          "iam:ListUsers",
+          "iam:ListGroups",
+          "iam:ListRolePolicies",
+          "iam:GetRole",
+          "iam:GetRolePolicy",
+          "iam:ListAttachedRolePolicies",
+          "kms:ListAliases",
+          "kms:DescribeKey",
+          "kms:Encrypt*",
+          "kms:Decrypt*",
+          "kms:GenerateDataKey",
+          "logs:AssociateKmsKey",
+          "logs:GetLogEvents",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogStreams"
+        ],
+        "Resource": "*"
+      },
+      {
+        "Sid": "AllowS3Access",
+        "Effect": "Allow",
+        "Action": [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket",
+          "s3:List*",
+          "s3:*Object*",
+          "s3:Get*",
+          "s3:CopyObject"
+        ],
+        "Resource": [
+          "arn:aws:s3:::${var.s3_bucket1}/*",
+          "arn:aws:s3:::${var.s3_bucket2}/*",
+          "arn:aws:s3:::${var.s3_bucket3}/*",
+          "arn:aws:s3:::${var.s3_bucket4}/*",
+          "arn:aws:s3:::${var.s3_bucket5}/*",
+          "arn:aws:s3:::${var.s3_bucket1}",
+          "arn:aws:s3:::${var.s3_bucket2}",
+          "arn:aws:s3:::${var.s3_bucket3}",
+          "arn:aws:s3:::${var.s3_bucket4}",
+          "arn:aws:s3:::${var.s3_bucket5}"
+        ]
+      }
     ]
-  })  
+  })
+
+  tags = merge(var.tags, {
+    Name = lower(join("-", [var.appname, "glue", "role-policy", var.environment]))
+  })
 }
 
-#AWS Glue - AWS resource for Glue policy attachment
-resource "aws_iam_policy_attachment" "glue_policy_attachment" {
-  name = "glue_policy"
-  roles = [aws_iam_role.gluerole.name]
-  policy_arn = aws_iam_policy.gluepolicy.arn
+# AWS Glue - AWS resource for Glue policy attachment
+resource "aws_iam_policy_attachment" "gluejob_policy_attachment" {
+  name       = "ddsl-glue-${var.environment}-policy-attachment"
+  roles      = [aws_iam_role.glue_role.name]
+  policy_arn = aws_iam_policy.ddsl_glue_job_policy.arn
 }
-#AWS Glue - AWS resource for service role 
+
+# AWS Glue - AWS resource for service role
 resource "aws_iam_policy_attachment" "AWSGlueServiceRole" {
   name       = "AWSGlueServiceRole"
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
-  roles      = [aws_iam_role.gluerole.name]
+  roles      = [aws_iam_role.glue_role.name]
 }
+
+# MSK - Create IAM role for AWS MSK
+resource "aws_iam_role" "iam_for_msk" {
+  name = "msk_role"
+
+  assume_role_policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": "sts:AssumeRole",
+        "Principal": {
+          "Service": "kafka.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+# MSK - IAM Policy for MSK
+resource "aws_iam_policy" "msk_policy" {
+  name        = "ddsl-msk-${var.environment}-policy"
+  description = "IAM policy for MSK access"
+  
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "AllowMSKClusterAccess",
+        Effect = "Allow",
+        Action = [
+          "kafka-cluster:Connect",
+          "kafka-cluster:AlterCluster",
+          "kafka-cluster:CreateTopic",
+          "kafka-cluster:DescribeCluster"
+        ],
+        Resource = "arn:aws:kafka:${var.region}:${var.aws_account_id}:cluster/ddsl-kafka-dev/*"
+      },
+      {
+        Sid    = "AllowKafkaTopicAccess",
+        Effect = "Allow",
+        Action = [
+          "kafka-cluster:WriteData",
+          "kafka-cluster:DescribeTopic",
+          "kafka-cluster:WriteDataIdempotently",
+          "kafka-cluster:AlterTopic",
+          "kafka-cluster:AlterTopicDynamicConfiguration",
+          "kafka-cluster:AlterClusterDynamicConfiguration",
+          "kafka-cluster:DescribeTopicDynamicConfiguration",
+          "kafka-cluster:DescribeClusterDynamicConfiguration",
+          "kafka-cluster:ReadData"
+        ],
+        Resource = "arn:aws:kafka:${var.region}:${var.aws_account_id}:topic/ddsl-kafka-dev/*"
+      },
+      {
+        Sid    = "AllowKafkaClusterGroupAccess",
+        Effect = "Allow",
+        Action = [
+          "kafka-cluster:AlterGroup",
+          "kafka-cluster:DescribeGroup"
+        ],
+        Resource = "arn:aws:kafka:${var.region}:${var.aws_account_id}:group/ddsl-kafka-dev/*"
+      }
+    ]
+  })
+
+  tags = merge(var.tags, {
+    Name = lower(join("-", [var.appname, "msk", "policy", var.environment]))
+  })
+}
+
+#MSK Resource for IAM Policy Attachement
+
+resource "aws_iam_policy_attachment" "msk_policy_attachment" {
+  name = "ddsl-msk-dev-policy-attachment"
+  roles = [module.msk_iam_role.name]
+  policy_arn = module.aws_msk_policy.arn
+}
+

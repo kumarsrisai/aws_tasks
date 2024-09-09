@@ -5,7 +5,7 @@
             "Sid": "Enable IAM User Permissions",
             "Effect": "Allow",
             "Principal": {
-                "AWS": "arn:aws:iam::590183849298:root"
+                "AWS": "arn:aws:iam::014498661566:root"
             },
             "Action": "kms:*",
             "Resource": "*"
@@ -20,10 +20,10 @@
             "Resource": "*",
             "Condition": {
                 "StringEquals": {
-                    "AWS:SourceArn": "arn:aws:cloudtrail:ap-northeast-1:590183849298:trail/TRAIL"
+                    "AWS:SourceArn": "arn:aws:cloudtrail:us-east-1:014498661566:trail/TRAIL"
                 },
                 "StringLike": {
-                    "kms:EncryptionContext:aws:cloudtrail:arn": "arn:aws:cloudtrail:*:590183849298:trail/*"
+                    "kms:EncryptionContext:aws:cloudtrail:arn": "arn:aws:cloudtrail:*:014498661566:trail/*"
                 }
             }
         },
@@ -50,10 +50,10 @@
             "Resource": "*",
             "Condition": {
                 "StringEquals": {
-                    "kms:CallerAccount": "590183849298"
+                    "kms:CallerAccount": "014498661566"
                 },
                 "StringLike": {
-                    "kms:EncryptionContext:aws:cloudtrail:arn": "arn:aws:cloudtrail:*:590183849298:trail/*"
+                    "kms:EncryptionContext:aws:cloudtrail:arn": "arn:aws:cloudtrail:*:014498661566:trail/*"
                 }
             }
         },
@@ -68,7 +68,7 @@
             "Condition": {
                 "StringEquals": {
                     "kms:ViaService": "ec2.us-east-1.amazonaws.com",
-                    "kms:CallerAccount": "590183849298"
+                    "kms:CallerAccount": "014498661566"
                 }
             }
         },
@@ -85,10 +85,10 @@
             "Resource": "*",
             "Condition": {
                 "StringEquals": {
-                    "kms:CallerAccount": "590183849298"
+                    "kms:CallerAccount": "014498661566"
                 },
                 "StringLike": {
-                    "kms:EncryptionContext:aws:cloudtrail:arn": "arn:aws:cloudtrail:*:590183849298:trail/*"
+                    "kms:EncryptionContext:aws:cloudtrail:arn": "arn:aws:cloudtrail:*:014498661566:trail/*"
                 }
             }
         },
@@ -96,7 +96,7 @@
             "Sid": "Access Logs to decrypt logs",
             "Effect": "Allow",
             "Principal": {
-                "Service": "logs.ap-northeast-1.amazonaws.com"
+                "Service": "logs.us-east-1.amazonaws.com"
             },
             "Action": [
                 "kms:Encrypt*",
@@ -111,7 +111,7 @@
             "Sid": "Access Logs to cloudwatch logs",
             "Effect": "Allow",
             "Principal": {
-                "Service": "logs.ap-northeast-1.amazonaws.com"                
+                "Service": "logs.us-east-1.amazonaws.com"                
             },
             "Action": "cloudwatch:*",            
             "Resource": "*"
@@ -120,7 +120,7 @@
             "Sid": "Access Logs to cloudtrail logs",
             "Effect": "Allow",
             "Principal": {
-                "Service": "logs.ap-northeast-1.amazonaws.com"                
+                "Service": "logs.us-east-1.amazonaws.com"                
             },
             "Action": "cloudtrail:*",            
             "Resource": "*"
@@ -132,7 +132,7 @@
               "logs:CreateLogStream"
             ],
             "Resource": [
-              "arn:aws:logs:ap-northeast-1:590183849298:log-group:DDSL:log-stream:590183849298_CloudTrail_ap-northeast-1*"
+              "arn:aws:logs:us-east-1:014498661566:log-group:DDSL:log-stream:014498661566_CloudTrail_us-east-1*"
             ]
           },
           {
@@ -142,7 +142,7 @@
               "logs:PutLogEvents"
             ],
             "Resource": [
-              "arn:aws:logs:ap-northeast-1:590183849298:log-group:DDSL:log-stream:590183849298_CloudTrail_ap-northeast-1*"
+              "arn:aws:logs:us-east-1:014498661566:log-group:DDSL:log-stream:014498661566_CloudTrail_us-east-1*"
             ]
           }         
     ]

@@ -91,3 +91,31 @@ variable "s3_bucket5" {
   type = string
   default = "ddsl-odsl-domain-developer"
 }
+
+variable "aws_account_id" {
+  description = "Accound id of my AWS"
+  type = string
+  default = "014498661566"
+}
+
+variable "tags" {
+  type = map(string)
+  default = {
+    Project     = "ddsl"
+    Environment = "dev"
+  }
+  description = "tags for my project"
+}
+
+variable "appname" {
+  type        = string
+  default     = "ddsl"
+  description = "The name of the application"
+}
+
+variable "environment" {
+  type        = string
+  default     = "dev"
+  description = "The environment for the resources"
+}
+
