@@ -314,6 +314,7 @@ resource "aws_s3_bucket_public_access_block" "public_access3" {
 #   policy = data.aws_iam_policy_document.example1.json
 # }
 
+
 #To upload the input files 
 resource "aws_s3_object" "s3_upload" {
   for_each = fileset("input_dir/", "**/*.*")
