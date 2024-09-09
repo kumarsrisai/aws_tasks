@@ -263,10 +263,11 @@ resource "aws_iam_policy" "stepfunction_invoke_gluejob_policy" {
         }                
      ]
      tags = merge(var.tags,{
-      name = lower(join("-", [var.appname, "statemachine", "role-policy", var.environment]))
+      Name = lower(join("-", [var.appname, "statemachine", "role-policy", var.environment]))
      })    
 })
 }
+
 #Stepfunction - AWS resource for stepfunction policy attachment
 resource "aws_iam_policy_attachment" "stepfunction_policy_attachment" {
   name = "ddsl-stestepfunction-dev-policy-attachment"
@@ -276,7 +277,7 @@ resource "aws_iam_policy_attachment" "stepfunction_policy_attachment" {
 
 # AWS Glue - IAM Resource for Gluejob
 resource "aws_iam_role" "glue_role" {
-  name = "gluerole"
+  name = "ddsl_glue_role"
   assume_role_policy = jsonencode({
     "Version": "2012-10-17",
     "Statement": [
