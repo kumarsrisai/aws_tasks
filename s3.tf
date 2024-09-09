@@ -338,3 +338,7 @@ resource "aws_security_group" "msk_sg" {
 
   # Define your security group rules here
 }
+resource "aws_s3_bucket" "data_bucket" {
+  bucket = "ddsl-processed-developer"
+  # other options like versioning, lifecycle, etc.
+}

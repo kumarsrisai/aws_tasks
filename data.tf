@@ -44,7 +44,7 @@ resource "aws_s3_bucket_policy" "cloudtrail_bucket_policy" {
 
 
 
-data "aws_s3_bucket" "existing_bucket" {
-  bucket = "ddsl-processed-developer"
-}
+# data "aws_s3_bucket" "existing_bucket" {
+#   bucket = "ddsl-processed-developer"
+# }
 
