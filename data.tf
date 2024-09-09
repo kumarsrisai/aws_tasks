@@ -43,7 +43,7 @@
 # }
 
 resource "aws_s3_bucket_policy" "cloudtrail_bucket_policy" {
-  bucket = aws_s3_bucket.ddsl_raw_extended_developer.id
+  bucket = aws_s3_bucket.ddsl-raw-extended-developer.id
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -55,7 +55,7 @@ resource "aws_s3_bucket_policy" "cloudtrail_bucket_policy" {
           Service = "cloudtrail.amazonaws.com"
         },
         Action    = "s3:GetBucketAcl",
-        Resource  = "${aws_s3_bucket.ddsl_raw_extended_developer.arn}"
+        Resource  = "${aws_s3_bucket.ddsl-raw-extended-developer.arn}"
       },
       {
         Sid       = "AWSCloudTrailWrite",
@@ -64,7 +64,7 @@ resource "aws_s3_bucket_policy" "cloudtrail_bucket_policy" {
           Service = "cloudtrail.amazonaws.com"
         },
         Action    = "s3:PutObject",
-        Resource  = "${aws_s3_bucket.ddsl_raw_extended_developer.arn}/*",
+        Resource  = "${aws_s3_bucket.ddsl-raw-extended-developer.arn}/*",
         Condition = {
           StringEquals = {
             "s3:x-amz-acl" = "bucket-owner-full-control"

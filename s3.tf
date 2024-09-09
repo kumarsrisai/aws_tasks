@@ -81,6 +81,7 @@ resource "aws_s3_object" "bucket1_folder3" {
 # S3 bucket to store Segregated Data
 resource "aws_s3_bucket" "example2" {
   bucket = var.s3_bucket2
+  
   lifecycle {
     prevent_destroy = false
   }
