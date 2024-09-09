@@ -19,7 +19,7 @@ data "aws_iam_policy_document" "example1" {
 }
 
 resource "aws_s3_bucket_policy" "cloudtrail_bucket_policy" {
-  bucket = aws_s3_bucket.data_bucket[0]x.id
+  bucket = aws_s3_bucket.data_bucket[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"
