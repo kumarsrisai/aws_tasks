@@ -9,7 +9,7 @@ resource "aws_kms_key_policy" "ddsl_kms_policy" {
             "Sid": "Enable IAM User Permissions",
             "Effect": "Allow",
             "Principal": {
-                "AWS": "arn:aws:iam::590183849298:root"
+                "AWS": "arn:aws:iam::014498661566:root"
             },
             "Action": "kms:*",
             "Resource": "*"
@@ -17,7 +17,7 @@ resource "aws_kms_key_policy" "ddsl_kms_policy" {
         {
             "Effect": "Allow",
             "Principal": {
-                "Service": "logs.ap-northeast-1.amazonaws.com"
+                "Service": "logs.us-east-1.amazonaws.com"
             },
             "Action": [
                 "kms:Encrypt*",
@@ -27,7 +27,7 @@ resource "aws_kms_key_policy" "ddsl_kms_policy" {
                 "kms:Describe*"
             ],
             "Resource": [
-              "arn:aws:kms:ap-northeeast-1:590183849298:key/*"
+              "arn:aws:kms:us-east-1:014498661566:key/*"
             ]
             "Condition": {
                 "ArnLike": {
