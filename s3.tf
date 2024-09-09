@@ -276,10 +276,10 @@ resource "aws_s3_bucket_public_access_block" "public_access3" {
   restrict_public_buckets = true
 }
 # #To create a S3 bucket with policy
-# resource "aws_s3_bucket_policy" "cloudtrail_bucket_policy" {
-#   bucket = aws_s3_bucket.example2.id
-#   policy = data.aws_iam_policy_document.example1.json
-# }
+resource "aws_s3_bucket_policy" "cloudtrail_bucket_policy" {
+  bucket = aws_s3_bucket.example2.id
+  policy = data.aws_iam_policy_document.example1.json
+}
 
 #To upload the input files 
 resource "aws_s3_object" "s3_upload" {

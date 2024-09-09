@@ -23,3 +23,7 @@ resource "aws_s3_bucket_policy" "cloudtrail_bucket_policy" {
   policy = data.aws_iam_policy_document.example1.json
 }
 
+data "aws_s3_bucket" "existing_bucket" {
+  bucket = "ddsl-procedded-developer"
+}
+
