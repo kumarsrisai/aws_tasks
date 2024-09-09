@@ -275,7 +275,7 @@ resource "aws_iam_policy_attachment" "stepfunction_policy_attachment" {
 }
 
 # AWS Glue - IAM Resource for Gluejob
-resource "aws_iam_role" "gluerole" {
+resource "aws_iam_role" "glue_role" {
   name = "gluerole"
   assume_role_policy = jsonencode({
     "Version": "2012-10-17",
