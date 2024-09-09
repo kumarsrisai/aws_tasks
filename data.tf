@@ -43,7 +43,7 @@
 # }
 
 resource "aws_s3_bucket_policy" "cloudtrail_bucket_policy" {
-  bucket = aws_s3_bucket.s3_bucket2.id
+  bucket = aws_s3_bucket.example2.id
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -55,7 +55,7 @@ resource "aws_s3_bucket_policy" "cloudtrail_bucket_policy" {
           Service = "cloudtrail.amazonaws.com"
         },
         Action    = "s3:GetBucketAcl",
-        Resource  = "${aws_s3_bucket.s3_bucket2.arn}"
+        Resource  = "${aws_s3_bucket.example2.arn}"
       },
       {
         Sid       = "AWSCloudTrailWrite",
@@ -64,7 +64,7 @@ resource "aws_s3_bucket_policy" "cloudtrail_bucket_policy" {
           Service = "cloudtrail.amazonaws.com"
         },
         Action    = "s3:PutObject",
-        Resource  = "${aws_s3_bucket.s3_bucket2.arn}/*",
+        Resource  = "${aws_s3_bucket.example2.arn}/*",
         Condition = {
           StringEquals = {
             "s3:x-amz-acl" = "bucket-owner-full-control"
