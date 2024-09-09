@@ -1,6 +1,29 @@
 resource "aws_sns_topic" "topic" {
   name = "s3-event-notification-topic"
 
+#   policy = <<POLICY
+# {
+#   "Version": "2012-10-17",
+#   "Statement": [
+#     {
+#       "Effect": "Allow",
+#       "Principal": { "Service": "s3.amazonaws.com" },
+#       "Action": "SNS:Publish",
+#       "Resource": "${aws_sns_topic.topic.arn}",
+#       "Condition": {
+#         "ArnLike": {
+#           "aws:SourceArn": "${aws_s3_bucket.example1.arn}"
+#         }
+#       }
+#     }
+#   ]
+# }
+# POLICY
+}
+
+# Added SNS topic policy after its creation
+resource "aws_sns_topic_policy" "sns_policy" {
+  arn    = aws_sns_topic.topic.arn
   policy = <<POLICY
 {
   "Version": "2012-10-17",
@@ -19,7 +42,13 @@ resource "aws_sns_topic" "topic" {
   ]
 }
 POLICY
+ depends_on = [
+    aws_sns_topic.topic,
+    aws_s3_bucket.example1
+  ]
 }
+
+
 
 
 # S3 bucket to store Raw Data

@@ -1,4 +1,3 @@
-#To create KMS resource 
 resource "aws_kms_key" "ddsl_kms" {
   description             = "KMS key for encrypting S3 bucket data"
   deletion_window_in_days = 30
@@ -37,11 +36,4 @@ POLICY
 
 output "kms_key_arn" {
   value = aws_kms_key.ddsl_kms.arn
-}
-
-
-#To create KMS Alias
-resource "aws_kms_alias" "ddsl_kms_key" {
-  name          = "alias/ddsl_kms_key_alias"
-  target_key_id = aws_kms_key.ddsl_kms.id
 }
