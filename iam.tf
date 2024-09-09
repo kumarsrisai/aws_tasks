@@ -276,7 +276,7 @@ resource "aws_iam_policy_attachment" "stepfunction_policy_attachment" {
 
 # AWS Glue - IAM Resource for Gluejob
 resource "aws_iam_role" "gluerole" {
-  name               = "gluerole"
+  name = "gluerole"
   assume_role_policy = jsonencode({
     "Version": "2012-10-17",
     "Statement": [
@@ -452,9 +452,9 @@ resource "aws_iam_policy" "msk_policy" {
 
 #MSK Resource for IAM Policy Attachement
 
-resource "aws_iam_policy_attachment" "msk_policy_attachment" {
-  name = "ddsl-msk-dev-policy-attachment"
-  roles = [module.msk_iam_role.name]
-  policy_arn = module.aws_msk_policy.arn
+# MSK - AWS Resource for IAM Policy Attachment
+resource "aws_iam_role_policy_attachment" "msk_policy_attachment" {
+  role       = aws_iam_role.iam_for_msk.name
+  policy_arn  = aws_iam_policy.msk_policy.arn
 }
 
