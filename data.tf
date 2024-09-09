@@ -25,13 +25,13 @@ resource "aws_s3_bucket_policy" "cloudtrail_bucket_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "AWSCloudTrailWrite"
-        Effect = "Allow"
+        Sid       = "AWSCloudTrailWrite"
+        Effect    = "Allow"
         Principal = {
           Service = "cloudtrail.amazonaws.com"
         }
-        Action   = "s3:PutObject"
-        Resource = "${aws_s3_bucket.data_bucket.arn}/*"
+        Action    = "s3:PutObject"
+        Resource  = "${aws_s3_bucket.data_bucket.arn}/*"
         Condition = {
           StringEquals = {
             "s3:x-amz-acl" = "bucket-owner-full-control"
@@ -41,6 +41,7 @@ resource "aws_s3_bucket_policy" "cloudtrail_bucket_policy" {
     ]
   })
 }
+
 
 
 data "aws_s3_bucket" "existing_bucket" {
