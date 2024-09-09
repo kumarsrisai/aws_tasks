@@ -2,7 +2,7 @@
 resource "aws_kms_key_policy" "ddsl_kms_policy" {
   key_id = aws_kms_key.ddsl_kms.arn
   policy = jsonencode({
-    "Version" = "2012-10-17"
+    "Version" = "2012-10-17",
     "Id" = "KMS policy"
     "Statement" = [
      {
@@ -451,8 +451,6 @@ resource "aws_iam_policy" "msk_policy" {
     Name = lower(join("-", [var.appname, "msk", "policy", var.environment]))
   })
 }
-
-#MSK Resource for IAM Policy Attachement
 
 # MSK - AWS Resource for IAM Policy Attachment
 resource "aws_iam_role_policy_attachment" "msk_policy_attachment" {
