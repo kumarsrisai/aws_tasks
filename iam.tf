@@ -263,7 +263,7 @@ resource "aws_iam_policy" "stepfunction_invoke_gluejob_policy" {
         }                
      ]
      tags = merge(var.tags,{
-      name = local(join("-", [var.appname, "statemachine", "role-policy", var.environment]))
+      name = lower(join("-", [var.appname, "statemachine", "role-policy", var.environment]))
      })    
 })
 }
