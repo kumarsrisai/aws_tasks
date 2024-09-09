@@ -10,7 +10,7 @@ resource "aws_kms_key" "ddsl_kms" {
       "Sid": "Enable IAM User Permissions",
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::590183849298:root"
+        "AWS": "arn:aws:iam::014498661566:root"
       },
       "Action": "kms:*",
       "Resource": "*"

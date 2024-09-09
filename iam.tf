@@ -9,7 +9,7 @@
 #             "Sid": "Enable IAM User Permissions",
 #             "Effect": "Allow",
 #             "Principal": {
-#                 "AWS": "arn:aws:iam::590183849298:root"
+#                 "AWS": "arn:aws:iam::014498661566:root"
 #             },
 #             "Action": "kms:*",
 #             "Resource": "*"
@@ -49,12 +49,19 @@ resource "aws_iam_role" "cloudtrail_cloudwatch_events_role" {
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "cloudtrail.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
+    "Effect": "Allow",
+    "Principal": {
+      "Service": "cloudtrail.amazonaws.com"
+    },
+    "Action": "s3:PutObject",
+    "Resource": "arn:aws:s3:::ddsl-raw-extended-developer/*",
+    "Condition": {
+      "StringEquals": {
+        "s3:x-amz-acl": "bucket-owner-full-control"
     }
+  }
+}
+
   ]
 }
 EOF
