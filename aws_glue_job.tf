@@ -21,7 +21,7 @@ resource "aws_glue_job" "example" {
 #AWS Glue job for a Py script
 resource "aws_glue_job" "data_quality1" {
   name = "Record_Level_DQ-dev1"
-  role_arn = aws_iam_role.gluerole.arn
+  role_arn = aws_iam_role.glue_role.arn
   max_capacity = "1.0"
   glue_version = "4.0"
   command {
@@ -40,7 +40,7 @@ resource "aws_glue_job" "data_quality1" {
 #AWS Glue job for a Py script
 resource "aws_glue_job" "data_quality2" {
   name = "History_Load-dev1"
-  role_arn = aws_iam_role.gluerole.arn
+  role_arn = aws_iam_role.glue_role.arn
   max_capacity = "1.0"
   glue_version = "4.0"
   command {
@@ -59,7 +59,7 @@ resource "aws_glue_job" "data_quality2" {
 #AWS Glue job for a Py script
 resource "aws_glue_job" "data_lineage" {
   name = "Data-Quality_File_Level_Check-dev"
-  role_arn = aws_iam_role.gluerole.arn  
+  role_arn = aws_iam_role.glue_role.arn  
   glue_version = "4.0"
   number_of_workers = "2.0"
   worker_type = "G.1X"
