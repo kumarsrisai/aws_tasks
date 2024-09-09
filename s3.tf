@@ -322,7 +322,15 @@ resource "aws_s3_object" "s3_upload" {
   source = "input_dir/${each.value}"
 }
 
+# Check if the bucket already exists
+data "aws_s3_bucket" "existing_data_bucket" {
+  count  = 1
+  bucket = "ddsl-processed-developer"
+}
+
+# Create the S3 bucket only if it doesn't exist
 resource "aws_s3_bucket" "data_bucket" {
+  count  = data.aws_s3_bucket.existing_data_bucket.*.id == [] ? 1 : 0
   bucket = "ddsl-processed-developer"
   # other configuration options
 }

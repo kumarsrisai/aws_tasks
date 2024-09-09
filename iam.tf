@@ -43,29 +43,46 @@
 #Cloudwatch -# Resource creation for IAM role for Cloudwatch
 resource "aws_iam_role" "cloudtrail_cloudwatch_events_role" {
   name               = "cloudtrail_cloudwatch_events_role"
-  path               = "/"
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-    "Effect": "Allow",
-    "Principal": {
-      "Service": "cloudtrail.amazonaws.com"
-    },
-    "Action": "s3:PutObject",
-    "Resource": "arn:aws:s3:::ddsl-raw-extended-developer/*",
-    "Condition": {
-      "StringEquals": {
-        "s3:x-amz-acl": "bucket-owner-full-control"
-    }
-  }
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect    = "Allow"
+        Principal = {
+          Service = "events.amazonaws.com"
+        }
+        Action    = "sts:AssumeRole"
+      }
+    ]
+  })
 }
 
-  ]
-}
-EOF
-}
+
+# resource "aws_iam_role" "cloudtrail_cloudwatch_events_role" {
+#   name               = "cloudtrail_cloudwatch_events_role"
+#   path               = "/"
+#   assume_role_policy = <<EOF
+# {
+#   "Version": "2012-10-17",
+#   "Statement": [
+#     {
+#     "Effect": "Allow",
+#     "Principal": {
+#       "Service": "cloudtrail.amazonaws.com"
+#     },
+#     "Action": "s3:PutObject",
+#     "Resource": "arn:aws:s3:::ddsl-raw-extended-developer/*",
+#     "Condition": {
+#       "StringEquals": {
+#         "s3:x-amz-acl": "bucket-owner-full-control"
+#     }
+#   }
+# }
+
+#   ]
+# }
+# EOF
+# }
 
 # Cloudwatch -Resource creation for IAM role policy for Cloudwatch
 resource "aws_iam_role_policy" "aws_iam_role_policy_cloudTrail_cloudWatch" {
