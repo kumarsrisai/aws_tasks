@@ -1,22 +1,26 @@
-#To Create SNS Topic 
 resource "aws_sns_topic" "topic" {
   name = "s3-event-notification-topic"
 
   policy = <<POLICY
 {
-    "Version":"2012-10-17",
-    "Statement":[{
-        "Effect": "Allow",
-        "Principal": { "Service": "s3.amazonaws.com" },
-        "Action": "SNS:Publish",
-        "Resource": "arn:aws:sns:*:*:s3-event-notification-topic",
-        "Condition":{
-            "ArnLike":{"aws:SourceArn":"${aws_s3_bucket.example1.arn}"}
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": { "Service": "s3.amazonaws.com" },
+      "Action": "SNS:Publish",
+      "Resource": "${aws_sns_topic.topic.arn}",
+      "Condition": {
+        "ArnLike": {
+          "aws:SourceArn": "${aws_s3_bucket.example1.arn}"
         }
-    }]
+      }
+    }
+  ]
 }
 POLICY
 }
+
 
 # S3 bucket to store Raw Data
 resource "aws_s3_bucket" "example1" {
@@ -205,8 +209,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default" {
   bucket = aws_s3_bucket.example1.id
   rule {
     apply_server_side_encryption_by_default {
-      kms_master_key_id = aws_kms_key.ddsl_kms.arn
-      sse_algorithm = "aws:kms"      
+      kms_master_key_id = aws_kms_key.ddsl_kms.key_id
+      sse_algorithm     = "aws:kms"
     }
   }
 }
