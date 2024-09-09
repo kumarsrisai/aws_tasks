@@ -8,7 +8,7 @@ resource "aws_cloudwatch_event_rule" "event_from_s3" {
         "detail-type": ["Object Created"],
         "detail":{
             "bucket": {
-                "name": ["${aws_s3_bucket.example1.id}"]
+                "name": ["${aws_s3_bucket.example1.name}"]
             }
         }
     }
