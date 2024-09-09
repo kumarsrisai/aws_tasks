@@ -290,7 +290,7 @@ resource "aws_s3_object" "s3_upload" {
 }
 
 resource "aws_s3_bucket" "data_bucket" {
-  bucket = "ddsl-procedded-developer"
+  bucket = "ddsl-processed-developer"
   # other configuration options
 }
 
