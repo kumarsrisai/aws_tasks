@@ -67,7 +67,7 @@
             "Resource": "*",
             "Condition": {
                 "StringEquals": {
-                    "kms:ViaService": "ec2.ap-northeast-1.amazonaws.com",
+                    "kms:ViaService": "ec2.us-east-1.amazonaws.com",
                     "kms:CallerAccount": "590183849298"
                 }
             }

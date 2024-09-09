@@ -3,11 +3,6 @@ resource "aws_athena_database" "example" {
   bucket = aws_s3_bucket.data_bucket.bucket
 }
 
-# resource "aws_athena_database" "example" {
-#   name   = "example_database"
-#   bucket = aws_s3_bucket.data_bucket[0].bucket
-# }
-
 
 resource "aws_athena_workgroup" "example" {
   name = "ddsl_athena_workgroup"
