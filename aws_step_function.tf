@@ -14,7 +14,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
             "Parameters": {
                 "JobName": "${aws_glue_job.example.name}",
                 "Arguments": {
-                    "--rec_type": "your_rec_type_value",  // Replace with actual value
+                    "--rec_type": "9001",  // Replace with actual value
                     "--env": "dev"  // Replace with actual environment value (e.g., 'dev' or 'prod')
                 }
             },
@@ -26,7 +26,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
             "Parameters": {
                 "JobName": "${aws_glue_job.data_quality1.name}",
                 "Arguments": {
-                    "--rec_type": "your_rec_type_value",  // Replace with actual value
+                    "--rec_type": "9001",  // Replace with actual value
                     "--env": "dev"  // Replace with actual environment value (e.g., 'dev' or 'prod')
                 }
             },
@@ -38,7 +38,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
             "Parameters": {
                 "JobName": "${aws_glue_job.data_quality2.name}",
                 "Arguments": {
-                    "--rec_type": "your_rec_type_value",  // Replace with actual value
+                    "--rec_type": "",  // Replace with actual value
                     "--env": "dev"  // Replace with actual environment value (e.g., 'dev' or 'prod')
                 }
             },
