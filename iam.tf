@@ -296,7 +296,7 @@ resource "aws_iam_role" "glue_role" {
 #AWS Glue -IAM Glue policy
 resource "aws_iam_policy" "ddsl_glue_job_policy" {
   name = "ddsl-glue-${var.environment}-policy"
-  
+
   policy = jsonencode({
     "Version": "2012-10-17",
     "Statement": [
@@ -364,7 +364,7 @@ resource "aws_iam_policy" "ddsl_glue_job_policy" {
   })
 
   tags = merge(var.tags, {
-    Name = lower(join("-", [var.appname, "glue", "role-policy", var.environment]))
+    Name = lower(join("-", [var.appname, "b", "role-policy", var.environment]))
   })
 }
 
@@ -400,29 +400,35 @@ resource "aws_iam_role" "iam_for_msk" {
   })
 }
 
+resource "aws_iam_role_policy_attachment" "msk_policy_attachment" {
+  role       = aws_iam_role.iam_for_msk.name
+  policy_arn  = aws_iam_policy.msk_policy.arn
+}
+
+
 # MSK - IAM Policy for MSK
 resource "aws_iam_policy" "msk_policy" {
   name        = "ddsl-msk-${var.environment}-policy"
   description = "IAM policy for MSK access"
   
   policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
+    "Version": "2012-10-17",
+    "Statement": [
       {
-        Sid    = "AllowMSKClusterAccess",
-        Effect = "Allow",
-        Action = [
+        "Sid": "AllowMSKClusterAccess",
+        "Effect": "Allow",
+        "Action": [
           "kafka-cluster:Connect",
           "kafka-cluster:AlterCluster",
           "kafka-cluster:CreateTopic",
           "kafka-cluster:DescribeCluster"
         ],
-        Resource = "arn:aws:kafka:${var.region}:${var.aws_account_id}:cluster/ddsl-kafka-dev/*"
+        "Resource": "arn:aws:kafka:${var.region}:${var.aws_account_id}:cluster/ddsl-kafka-dev/*"
       },
       {
-        Sid    = "AllowKafkaTopicAccess",
-        Effect = "Allow",
-        Action = [
+        "Sid": "AllowKafkaTopicAccess",
+        "Effect": "Allow",
+        "Action": [
           "kafka-cluster:WriteData",
           "kafka-cluster:DescribeTopic",
           "kafka-cluster:WriteDataIdempotently",
@@ -433,16 +439,16 @@ resource "aws_iam_policy" "msk_policy" {
           "kafka-cluster:DescribeClusterDynamicConfiguration",
           "kafka-cluster:ReadData"
         ],
-        Resource = "arn:aws:kafka:${var.region}:${var.aws_account_id}:topic/ddsl-kafka-dev/*"
+        "Resource": "arn:aws:kafka:${var.region}:${var.aws_account_id}:topic/ddsl-kafka-dev/*"
       },
       {
-        Sid    = "AllowKafkaClusterGroupAccess",
-        Effect = "Allow",
-        Action = [
+        "Sid": "AllowKafkaClusterGroupAccess",
+        "Effect": "Allow",
+        "Action": [
           "kafka-cluster:AlterGroup",
           "kafka-cluster:DescribeGroup"
         ],
-        Resource = "arn:aws:kafka:${var.region}:${var.aws_account_id}:group/ddsl-kafka-dev/*"
+        "Resource": "arn:aws:kafka:${var.region}:${var.aws_account_id}:group/ddsl-kafka-dev/*"
       }
     ]
   })
@@ -452,9 +458,10 @@ resource "aws_iam_policy" "msk_policy" {
   })
 }
 
-# MSK - AWS Resource for IAM Policy Attachment
-resource "aws_iam_role_policy_attachment" "msk_policy_attachment" {
-  role       = aws_iam_role.iam_for_msk.name
-  policy_arn  = aws_iam_policy.msk_policy.arn
-}
+
+# # MSK - AWS Resource for IAM Policy Attachment
+# resource "aws_iam_role_policy_attachment" "msk_policy_attachment" {
+#   role       = aws_iam_role.iam_for_msk.name
+#   policy_arn  = aws_iam_policy.msk_policy.arn
+# }
 
