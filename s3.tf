@@ -77,7 +77,7 @@ resource "aws_s3_object" "bucket2_subfolder2" {
 resource "aws_s3_bucket" "example3" {
   bucket = var.s3_bucket3
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
   tags = {
     Name        = var.s3_bucket3
