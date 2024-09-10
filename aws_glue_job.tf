@@ -16,6 +16,9 @@ resource "aws_glue_job" "segregate" {
     "--enable-continuous-log-filter"     = "true"
     "--enable-metrics"                   = ""
   }
+  execution_property {
+    max_concurrent_runs = 10 
+  }
 }
 
 #AWS Glue job for a Py script
@@ -35,6 +38,9 @@ resource "aws_glue_job" "data_quality1" {
     "--enable-continuous-log-filter"     = "true"
     "--enable-metrics"                   = ""
   }
+  execution_property {
+    max_concurrent_runs = 10 
+  }
 }
 
 #AWS Glue job for a Py script
@@ -53,6 +59,9 @@ resource "aws_glue_job" "data_quality2" {
     "--enable-continuous-cloudwatch-log" = "true"
     "--enable-continuous-log-filter"     = "true"
     "--enable-metrics"                   = ""
+  }
+  execution_property {
+    max_concurrent_runs = 10 
   }
 }
 
@@ -78,6 +87,9 @@ resource "aws_glue_job" "data_lineage" {
     "--extra-jars"                       = "s3://${aws_s3_bucket.example1.bucket}/openlineage-spark_2.12-1.13.1.jar,"
     "--user-jars-first"                  = "true" 
     "--encryption-type"                  = ""
+  }
+  execution_property {
+    max_concurrent_runs = 10 
   }
 }
 
