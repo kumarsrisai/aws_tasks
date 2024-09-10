@@ -14,8 +14,8 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
             "Parameters": {
                 "JobName": "${aws_glue_job.example.name}",
                 "Arguments": {
-                    "--rec_type": "9001",  // Replace with actual value
-                    "--env": "dev"  // Replace with actual environment value (e.g., 'dev' or 'prod')
+                    "--rec_type": "9001",
+                    "--env": "dev"
                 }
             },
             "Next": "Passed Record Job run"
@@ -26,8 +26,8 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
             "Parameters": {
                 "JobName": "${aws_glue_job.data_quality1.name}",
                 "Arguments": {
-                    "--rec_type": "9001",  // Replace with actual value
-                    "--env": "dev"  // Replace with actual environment value (e.g., 'dev' or 'prod')
+                    "--rec_type": "9001",
+                    "--env": "dev"
                 }
             },
             "Next": "Checksum Record Job run"
@@ -38,8 +38,8 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
             "Parameters": {
                 "JobName": "${aws_glue_job.data_quality2.name}",
                 "Arguments": {
-                    "--rec_type": "9001",  // Replace with actual value
-                    "--env": "dev"  // Replace with actual environment value (e.g., 'dev' or 'prod')
+                    "--rec_type": "9001",
+                    "--env": "dev"
                 }
             },
             "End": true
