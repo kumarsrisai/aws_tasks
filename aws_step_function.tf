@@ -1,4 +1,3 @@
-// Create state machine for step function
 resource "aws_sfn_state_machine" "sfn_state_machine" {
   name     = "ddsl-sfn-state-machine-developer" 
   
@@ -13,32 +12,44 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
             "Type": "Task",
             "Resource": "arn:aws:states:::glue:startJobRun.sync",
             "Parameters": {
-                "JobName": "${aws_glue_job.example.name}"
+                "JobName": "${aws_glue_job.example.name}",
+                "Arguments": {
+                    "--rec_type": "your_rec_type_value",  // Replace with actual value
+                    "--env": "dev"  // Replace with actual environment value (e.g., 'dev' or 'prod')
+                }
             },
             "Next": "Passed Record Job run"
         },
         "Passed Record Job run": {
-                    "Type": "Task",
-                    "Resource": "arn:aws:states:::glue:startJobRun.sync",
-                    "Parameters": {
-                        "JobName": "${aws_glue_job.data_quality1.name}"
-                    },
-                    "Next": "Checksum Record Job run"
-                },
-        "Checksum Record Job run": {
-                    "Type": "Task",
-                    "Resource": "arn:aws:states:::glue:startJobRun.sync",
-                    "Parameters": {
-                        "JobName": "${aws_glue_job.data_quality2.name}"
-                    },
-                    "End": true
+            "Type": "Task",
+            "Resource": "arn:aws:states:::glue:startJobRun.sync",
+            "Parameters": {
+                "JobName": "${aws_glue_job.data_quality1.name}",
+                "Arguments": {
+                    "--rec_type": "your_rec_type_value",  // Replace with actual value
+                    "--env": "dev"  // Replace with actual environment value (e.g., 'dev' or 'prod')
                 }
+            },
+            "Next": "Checksum Record Job run"
+        },
+        "Checksum Record Job run": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::glue:startJobRun.sync",
+            "Parameters": {
+                "JobName": "${aws_glue_job.data_quality2.name}",
+                "Arguments": {
+                    "--rec_type": "your_rec_type_value",  // Replace with actual value
+                    "--env": "dev"  // Replace with actual environment value (e.g., 'dev' or 'prod')
+                }
+            },
+            "End": true
+        }
     }
 }
 EOF
-logging_configuration {  
-  log_destination = "${aws_cloudwatch_log_group.stepfunction_log_group.arn}:*"
-  include_execution_data = true
-  level = "ALL"  
+  logging_configuration {  
+    log_destination = "${aws_cloudwatch_log_group.stepfunction_log_group.arn}:*"
+    include_execution_data = true
+    level = "ALL"  
+  }
 }
-}  
