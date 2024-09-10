@@ -1,6 +1,6 @@
 #AWS Glue job for a Python script
-resource "aws_glue_job" "example" {
-  name = "DDSL_Glue_job"
+resource "aws_glue_job" "segregate" {
+  name = "Segregate"
   role_arn = aws_iam_role.glue_role.arn
   glue_version = "4.0"  
   number_of_workers = "2.0"

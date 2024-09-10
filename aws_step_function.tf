@@ -11,7 +11,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
             "Type": "Task",
             "Resource": "arn:aws:states:::glue:startJobRun.sync",
             "Parameters": {
-                "JobName": "${aws_glue_job.example.name}",
+                "JobName": "${aws_glue_job.segregate.name}",
                 "Arguments": {
                     "--rec_type": "9001",
                     "--env": "dev"

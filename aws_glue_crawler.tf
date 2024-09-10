@@ -6,7 +6,7 @@
 resource "aws_glue_crawler" "example" {
   #database_name = "${aws_glue_catalog_database.example.name}"
   database_name = var.database_name
-  name          = "virginia_crawler"
+  name          = "ddsl-crawler"
   role          = aws_iam_role.glue_role.arn
 
   s3_target {
