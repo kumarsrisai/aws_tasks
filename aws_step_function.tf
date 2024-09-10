@@ -1,6 +1,5 @@
 resource "aws_sfn_state_machine" "sfn_state_machine" {
   name     = "ddsl-sfn-state-machine-developer" 
-  
   role_arn = aws_iam_role.iam_for_sfn.arn
   type     = "STANDARD"
   definition = <<EOF
@@ -47,7 +46,6 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
     }
 }
 EOF
-
   logging_configuration {  
     log_destination = "${aws_cloudwatch_log_group.stepfunction_log_group.arn}:*"
     include_execution_data = true
