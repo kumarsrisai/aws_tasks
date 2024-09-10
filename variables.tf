@@ -77,7 +77,7 @@ variable "s3_bucket2" {
 variable "s3_bucket3" {
   description = "name of the bucket3"
   type = string
-  default = "ddsl-dq-devloper"
+  default = "ddsl-dq-developer"
 }
 
 variable "s3_bucket4" {
