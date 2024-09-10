@@ -80,6 +80,7 @@ variable "s3_bucket3" {
   default = "ddsl-dq-developer"
 }
 
+
 variable "s3_bucket4" {
   description = "name of the bucket4"
   type = string
