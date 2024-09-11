@@ -41,6 +41,17 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
                     "--env": "dev"
                 }
             },
+            "Next": "Checksum Record Job run"
+        },
+        "Checksum Record Job run": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::glue:startJobRun.sync",
+            "Parameters": {
+                "JobName": "${aws_glue_job.data_lineage.name}",
+                "Arguments": {
+                    "--rec_type": "9001",
+                    "--env": "dev"
+                }
             "End": true
         }
     }

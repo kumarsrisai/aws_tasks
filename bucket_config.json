@@ -1,0 +1,9 @@
+{
+   "dev":{
+      "RAW_DATA_BKT":"ddsl-raw-developer",
+      "SPLITTED_DATA_BKT":"ddsl-raw-extended-developer",
+      "DQ_DATA_BKT":"ddsl-dq-developer",
+      "PREPROCESSED_DATA_BKT":"ddsl-processed-developer",
+      "ODS_DATA_BKT":"ddsl-odsl-domain-developer"
+   }
+}
