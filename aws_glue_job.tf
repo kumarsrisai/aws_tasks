@@ -66,7 +66,7 @@ resource "aws_glue_job" "data_quality2" {
 }
 
 #AWS Glue job for a Py script
-resource "aws_glue_job" "data_lineage" {
+resource "aws_glue_job" "data_history" {
   name = "History_Load-dev1"
   role_arn = aws_iam_role.glue_role.arn  
   glue_version = "4.0"
@@ -74,7 +74,7 @@ resource "aws_glue_job" "data_lineage" {
   worker_type = "G.1X"
   command {
     #name            = "pythonshell"
-    script_location = "s3://${aws_s3_bucket.example1.bucket}/lineage.py"
+    script_location = "s3://${aws_s3_bucket.example1.bucket}/history-load.py"
     python_version = "3"
   }
    default_arguments = {    
@@ -83,7 +83,7 @@ resource "aws_glue_job" "data_lineage" {
     "--enable-continuous-log-filter"     = "true"
     "--enable-metrics"                   = ""
     "--job-language"                     = "Python 3"
-    "--scriptLocation"                   = "s3://${aws_s3_bucket.example1.bucket}/lineage.py"
+    "--scriptLocation"                   = "s3://${aws_s3_bucket.example1.bucket}/history-load.py"
     "--extra-jars"                       = "s3://${aws_s3_bucket.example1.bucket}/openlineage-spark_2.12-1.13.1.jar,"
     "--user-jars-first"                  = "true" 
     "--encryption-type"                  = ""
