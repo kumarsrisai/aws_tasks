@@ -47,7 +47,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
             "Type": "Task",
             "Resource": "arn:aws:states:::glue:startJobRun.sync",
             "Parameters": {
-                "JobName": "${aws_glue_job.data_quality2.name}",  // Ensure this points to Record_Level_DQ-dev1
+                "JobName": "${aws_glue_job.data_quality2.name}",  
                 "Arguments": {
                     "--rec_type": "9001",
                     "--env": "dev"
@@ -59,7 +59,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
             "Type": "Task",
             "Resource": "arn:aws:states:::glue:startJobRun.sync",
             "Parameters": {
-                "JobName": "${aws_glue_job.data_lineage.name}",  // Points to History_Load-dev1
+                "JobName": "${aws_glue_job.data_lineage.name}", 
                 "Arguments": {
                     "--rec_type": "9001",
                     "--env": "dev"
