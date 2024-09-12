@@ -25,7 +25,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
             "Parameters": {
                 "JobName": "${aws_glue_job.data_quality1.name}",
                 "Arguments": {
-                    
+                    "--rec_type": "rec_type_9000",
                     "--env": "dev"
                 }
             },
