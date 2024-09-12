@@ -13,7 +13,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
             "Parameters": {
                 "JobName": "${aws_glue_job.segregate.name}",
                 "Arguments": {
-                    # "--rec_type": "9001",
+                    # "--rec_type": "9000",
                     "--env": "dev"
                 }
             },
@@ -25,7 +25,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
             "Parameters": {
                 "JobName": "${aws_glue_job.data_quality1.name}",
                 "Arguments": {
-                    # "--rec_type": "9001",
+                    # "--rec_type": "9000",
                     "--env": "dev"
                 }
             },
@@ -37,59 +37,19 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
             "Parameters": {
                 "JobName": "${aws_glue_job.data_quality2.name}",
                 "Arguments": {
-                    "--rec_type": "9001",
+                    "--rec_type": "rec_type_9000",
                     "--env": "dev"
                 }
             },
-            "Next": "Checksum Parallel"
+            "Next": "History level validation Job run"
         },
-        "Checksum Parallel": {
-            "Type": "Parallel",
-            "Branches": [
-                {
-                    "StartAt": "Checksum Record Job 1",
-                    "States": {
-                        "Checksum Record Job 1": {
-                            "Type": "Task",
-                            "Resource": "arn:aws:states:::glue:startJobRun.sync",
-                            "Parameters": {
-                                "JobName": "${aws_glue_job.data_quality2.name}",
-                                "Arguments": {
-                                    "--rec_type": "9001",
-                                    "--env": "dev"
-                                }
-                            },
-                            "End": true
-                        }
-                    }
-                },
-                {
-                    "StartAt": "Checksum Record Job 2",
-                    "States": {
-                        "Checksum Record Job 2": {
-                            "Type": "Task",
-                            "Resource": "arn:aws:states:::glue:startJobRun.sync",
-                            "Parameters": {
-                                "JobName": "${aws_glue_job.data_quality3.name}",
-                                "Arguments": {
-                                    "--rec_type": "9001",
-                                    "--env": "dev"
-                                }
-                            },
-                            "End": true
-                        }
-                    }
-                }
-            ],
-            "Next": "Record_Level_DQ_dev1 Job run"
-        },
-        "Record_Level_DQ_dev1 Job run": {
+        "History level validation Job run": {
             "Type": "Task",
             "Resource": "arn:aws:states:::glue:startJobRun.sync",
             "Parameters": {
-                "JobName": "${aws_glue_job.data_history.name}",  
+                "JobName": "${aws_glue_job.data_history.name}",
                 "Arguments": {
-                    "--rec_type": "9001",
+                    "--rec_type": "rec_type_9000",
                     "--env": "dev"
                 }
             },
