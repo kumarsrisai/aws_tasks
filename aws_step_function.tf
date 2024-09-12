@@ -13,7 +13,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
             "Parameters": {
                 "JobName": "${aws_glue_job.segregate.name}",
                 "Arguments": {
-                    "--rec_type": "9001",
+                    # "--rec_type": "9001",
                     "--env": "dev"
                 }
             },
@@ -24,6 +24,18 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
             "Resource": "arn:aws:states:::glue:startJobRun.sync",
             "Parameters": {
                 "JobName": "${aws_glue_job.data_quality1.name}",
+                "Arguments": {
+                    # "--rec_type": "9001",
+                    "--env": "dev"
+                }
+            },
+            "Next": "Checksum Record Job run"
+        },
+        "Checksum Record Job run": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::glue:startJobRun.sync",
+            "Parameters": {
+                "JobName": "${aws_glue_job.data_quality2.name}",
                 "Arguments": {
                     "--rec_type": "9001",
                     "--env": "dev"
