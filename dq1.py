@@ -1,6 +1,3 @@
-#sb_Data_Quality_File_Level_Check
-
-
 import boto3
 import os
 from awsglue.context import GlueContext
@@ -27,7 +24,9 @@ def move_file(source_key, status):
         CopySource={'Bucket': input_bucket, 'Key': source_key},
         Key=f'{destination_folder}{os.path.basename(source_key)}'
     )
-    s3.delete_object(Bucket=input_bucket, Key=source_key)
+    # Uncomment the next line if you want to delete the source file
+    # s3.delete_object(Bucket=input_bucket, Key=source_key)
+    print(f"File {source_key} moved to {destination_folder}")
 
 # List files in input bucket
 response = s3.list_objects_v2(Bucket=input_bucket, Prefix='batch_splitted/')
@@ -84,20 +83,17 @@ else:
             actual_row_count = df.count()
 
             # Compare row counts
+            print(f"File {file_name} - Actual: {actual_row_count}, Reference: {reference_row_count}")
             if actual_row_count != reference_row_count:
                 print(f"Row count mismatch for file {file_name}: Actual: {actual_row_count}, Reference: {reference_row_count}")
-                move_file(file_key, 'bad')  # Move to 'bad' folder inside batch_dq if counts don't match
+                move_file(file_key, 'bad')  # Move to 'bad' folder if counts don't match
             else:
                 print(f"Row count match for file {file_name}: {actual_row_count}")
-                move_file(file_key, 'good')  # Move to 'good' folder inside batch_dq if counts match
+                move_file(file_key, 'good')  # Move to 'good' folder if counts match
 
         except Exception as e:
             print(f"Error processing file {file_name}: {e}")
             move_file(file_key, 'bad')
-
-
-
-
 
 # import boto3
 # import os
