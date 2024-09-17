@@ -1,8 +1,9 @@
 resource "aws_sfn_state_machine" "sfn_state_machine" {
-  name     = "ddsl-sfn-state-machine-developer"
+  name     = "sample-state-machine" 
+  
   role_arn = aws_iam_role.iam_for_sfn.arn
   type     = "STANDARD"
-  definition = <<EOF 
+  definition = <<EOF
 {
     "Comment": "To trigger events from S3 to StepFunction to AWS Glue",
     "StartAt": "Segregate",
