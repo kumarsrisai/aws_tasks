@@ -87,6 +87,7 @@ resource "aws_glue_job" "data_history" {
     "--scriptLocation"                   = "s3://${aws_s3_bucket.example1.bucket}/history-load.py"
   }
 
+
   execution_property {
     max_concurrent_runs = 10
   }
@@ -97,7 +98,31 @@ resource "aws_glue_job" "data_history" {
       name, # This will prevent issues if job already exists
     ]
   }
+
 }
+#AWS Glue job for a Python script
+resource "aws_glue_job" "data_transpose" {
+  name = "rec_type_transpose"
+  role_arn = aws_iam_role.glue_role.arn
+  glue_version = "4.0"  
+  number_of_workers = "2.0"
+  worker_type = "G.1X"
+  command {
+    #name            = "pythonshell"
+    script_location = "s3://${aws_s3_bucket.example1.bucket}/rec-type-transpose.py"
+    python_version = "3"
+  }
+   default_arguments = {    
+    "--continuous-log-logGroup"          = aws_cloudwatch_log_group.glue_job_log_group.name
+    "--enable-continuous-cloudwatch-log" = "true"
+    "--enable-continuous-log-filter"     = "true"
+    "--enable-metrics"                   = ""
+  }
+  execution_property {
+    max_concurrent_runs = 10 
+  }
+}
+
 
 
 
