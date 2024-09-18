@@ -408,10 +408,12 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
                   }
                 }
               }
-            ],
+            ]
+            },
             "Next": "FinalState"
           }
-    }
+     }
+  }
 EOF
 logging_configuration {  
     log_destination = "${aws_cloudwatch_log_group.stepfunction_log_group.arn}:*"
