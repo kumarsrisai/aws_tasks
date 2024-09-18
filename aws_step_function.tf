@@ -1,5 +1,5 @@
 resource "aws_sfn_state_machine" "sfn_state_machine" {
-  name     = "sample-state-machine" 
+  name     = "ddsl-sfn-state-machine-developer" 
   role_arn = aws_iam_role.iam_for_sfn.arn
   type     = "STANDARD"
 

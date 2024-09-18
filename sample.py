@@ -116,7 +116,7 @@
           "Type": "Task",
           "Resource": "arn:aws:states:::glue:startJobRun.sync",
           "Parameters": {
-            "JobName": "${aws_glue_job.data_history.name}",
+            "JobName": "sb_History_Load-dev1_v2",
             "Arguments": {
               "--rec_type": "rec_type_9005",
               "--env": "cg_dev",
@@ -271,7 +271,7 @@
           "Type": "Task",
           "Resource": "arn:aws:states:::glue:startJobRun.sync",
           "Parameters": {
-            "JobName": "${aws_glue_job.data_history.name}",
+            "JobName": "sb_History_Load-dev1_v2",
             "Arguments": {
               "--rec_type": "rec_type_9019",
               "--env": "cg_dev",
