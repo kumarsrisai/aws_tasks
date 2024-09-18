@@ -319,7 +319,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
                     "Type": "Task",
                     "Resource": "arn:aws:states:::glue:startJobRun.sync",
                     "Parameters": {
-                      "JobName": "sb_Rec_type_Transpose",
+                      "JobName": "${aws_glue_job.data_transpose.name}",
                       "Arguments": {
                         "--rec_type": "rec_type_9019",
                         "--env": "dev"

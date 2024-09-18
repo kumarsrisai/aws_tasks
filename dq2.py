@@ -72,16 +72,16 @@ def s3_file_exists(bucket_name, file_key):
             raise
 
 # Define environment-specific bucket
-raw_bkt = 'ddsl-raw-cg-vl' if env == 'cg_dev' else 'ddsl-raw-dev1'
+raw_bkt = 'ddsl-raw-developer' if env == 'dev' else 'ddsl-raw-dev1'
 
 # Load bucket parameters from S3
-bkt_params = read_s3_json(raw_bkt, 'job_config/batch_config/bucket_config.json')
+bkt_params = read_s3_json(raw_bkt, 'job_config/bucket_config.json')
 
 # Retrieve file paths
-input_file_path = f"s3://{bkt_params[env]['DQ_DATA_BKT']}/batch_dq_checksum/accounting/pass/{rec_type}.txt"
+input_file_path = f"s3://{bkt_params[env]['DQ_DATA_BKT']}/batch_dq/accounting/good/{rec_type}.txt"
 rules_file_path = f"s3://{bkt_params[env]['RAW_DATA_BKT']}/job_config/batch_config/ruleset.json"
-failed_records_path = f"s3://{bkt_params[env]['DQ_DATA_BKT']}/batch_dq_recordlevel/accounting/fail/{rec_type}/"
-passed_records_path = f"s3://{bkt_params[env]['DQ_DATA_BKT']}/batch_dq_recordlevel/accounting/pass/{rec_type}/"
+failed_records_path = f"s3://{bkt_params[env]['DQ_DATA_BKT']}/batch_dq/accounting/fail/{rec_type}/"
+passed_records_path = f"s3://{bkt_params[env]['DQ_DATA_BKT']}/batch_dq/accounting/pass/{rec_type}/"
 
 # Extract bucket and key from input_file_path
 parsed_url = urlparse(input_file_path)
@@ -102,7 +102,7 @@ if s3_file_exists(input_bucket, input_key):
     )
 
     # Read the column definitions from S3
-    column_details = read_s3_json(bkt_params[env]['RAW_DATA_BKT'], 'job_config/batch_config/columns.json')
+    column_details = read_s3_json(bkt_params[env]['RAW_DATA_BKT'], 'job_config/columns.json')
     
     # Check if rec_type exists in column details
     if rec_type not in column_details:

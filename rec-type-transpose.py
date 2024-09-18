@@ -51,7 +51,7 @@ def read_s3_json(bucket, key):
         raise RuntimeError(f"Error reading S3 file: {e}")
 
 if env == 'dev' :
-    raw_bkt = 'ddsl-raw-developer/'
+    raw_bkt = 'ddsl-raw-developer'
 else :
     raw_bkt = 'ddsl-raw-dev1'
     
