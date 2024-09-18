@@ -410,6 +410,9 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
               }
             ],
             "Next": "FinalState"
+          },
+          "FinalState":{
+          "Type":"Succeed"
           }
      }
   }
