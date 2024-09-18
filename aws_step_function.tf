@@ -13,8 +13,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
             "Resource": "arn:aws:states:::glue:startJobRun.sync",
             "Parameters": {
                 "JobName": "${aws_glue_job.segregate.name}",
-                "Arguments": {
-                   
+                "Arguments": { 
                     "--env": "dev"
                 }
             },
@@ -32,8 +31,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
             },
             "Next": "Checksum Record Job run"
         },
-        "Checksum Record Job run": 
-        {
+        "Checksum Record Job run":{
             "Type": "Parallel",
             "Branches": [
               {
@@ -43,7 +41,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
                     "Type": "Task",
                     "Resource": "arn:aws:states:::glue:startJobRun.sync",
                     "Parameters": {
-                      "JobName": "${aws_glue_job.data_quality2.name}"
+                      "JobName": "${aws_glue_job.data_quality2.name}",
                       "Arguments": {
                         "--rec_type": "rec_type_9000",
                         "--env": "dev"
