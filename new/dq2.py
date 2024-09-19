@@ -78,7 +78,7 @@ raw_bkt = 'ddsl-raw-developer' if env == 'dev' else 'ddsl-raw-dev1'
 bkt_params = read_s3_json(raw_bkt, 'job_config/bucket_config.json')
 
 # Retrieve file paths
-input_file_path = f"s3://{bkt_params[env]['DQ_DATA_BKT']}/batch_dq_checksum/accounting/good/{rec_type}.txt"
+input_file_path = f"s3://{bkt_params[env]['DQ_DATA_BKT']}/batch_dq_checksum/accounting/pass/{rec_type}.txt"
 rules_file_path = f"s3://{bkt_params[env]['RAW_DATA_BKT']}/job_config/ruleset.json"
 failed_records_path = f"s3://{bkt_params[env]['DQ_DATA_BKT']}/batch_dq_recordlevel/accounting/fail/{rec_type}/"
 passed_records_path = f"s3://{bkt_params[env]['DQ_DATA_BKT']}/batch_dq_recordlevel/accounting/pass/{rec_type}/"

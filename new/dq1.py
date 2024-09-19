@@ -40,9 +40,9 @@ def read_s3_json(bucket, key):
         raise RuntimeError(f"Error reading S3 file: {e}")
       
 if env == 'dev' :
-    raw_bkt = 'ddsl-raw-extended-developer'
+    raw_bkt = 'ddsl-raw-developer'
 else :
-    raw_bkt = 'ddsl-dq-developer'
+    raw_bkt = 'ddsl-raw-dev1'
     
 # print ('raw_bkt = ', raw_bkt)
 bkt_params = read_s3_json(raw_bkt, 'job_config/bucket_config.json')
@@ -53,7 +53,7 @@ output_bucket = bkt_params[env]['DQ_DATA_BKT']
 
 # Function to move file to another folder in S3
 def move_file(source_key, status):
-    destination_folder = f'batch_dq/accounting/{status}'
+    destination_folder = f'batch_dq_checksum/accounting/{status}'
     s3.copy_object(
         Bucket=output_bucket,
         CopySource={'Bucket': input_bucket, 'Key': source_key},

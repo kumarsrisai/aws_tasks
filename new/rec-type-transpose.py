@@ -70,7 +70,7 @@ pivot_cols = rec_type_params['pivot_cols']
 agg_cols = rec_type_params['agg_cols']
 
 input_path = f"s3://{bkt_params[env]['DQ_DATA_BKT']}/batch_dq_recordlevel/accounting/pass/{rec_type}/"
-output_path = f"s3://{bkt_params[env]['DQ_DATA_BKT']}/transpose_output/{rec_type}/"
+output_path = f"s3://{bkt_params[env]['DQ_DATA_BKT']}/Transpose_output/{rec_type}/"
 
 # Extract bucket and key from input_file_path
 parsed_url = urlparse(input_path)

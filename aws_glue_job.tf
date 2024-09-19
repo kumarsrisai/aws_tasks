@@ -100,6 +100,45 @@ resource "aws_glue_job" "data_history" {
   }
 
 }
+
+
+#AWS Glue job for a Py script
+resource "aws_glue_job" "data_update" {
+  name          = "History_Update-dev"
+  role_arn      = aws_iam_role.glue_role.arn
+  glue_version  = "4.0"
+  number_of_workers = 2
+  worker_type   = "G.1X"
+  
+  command {
+    script_location = "s3://${aws_s3_bucket.example1.bucket}/history-update.py"
+    python_version  = "3"
+  }
+
+  default_arguments = {    
+    "--continuous-log-logGroup"          = aws_cloudwatch_log_group.data_lineage.name
+    "--enable-continuous-cloudwatch-log" = "true"
+    "--enable-continuous-log-filter"     = "true"
+    "--enable-metrics"                   = ""
+    "--job-language"                     = "Python 3"
+    "--scriptLocation"                   = "s3://${aws_s3_bucket.example1.bucket}/history-update.py"
+  }
+
+
+  execution_property {
+    max_concurrent_runs = 10
+  }
+
+  # Add lifecycle block to avoid idempotency issues
+  lifecycle {
+    ignore_changes = [
+      name, # This will prevent issues if job already exists
+    ]
+  }
+
+}
+
+
 #AWS Glue job for a Python script
 resource "aws_glue_job" "data_transpose" {
   name = "rec_type_transpose"
