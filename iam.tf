@@ -208,16 +208,16 @@ resource "aws_iam_policy_attachment" "eventbridge_policy_attachment" {
   })
 }
 
-# Stepfunction - Create IAM policy for AWS Step function
+# Step Function - Create IAM policy for AWS Step function
 resource "aws_iam_policy" "stepfunction_invoke_gluejob_policy" {
   name = "ddsl_stepfunction_dev_policy"
   policy = jsonencode({
-    "Version" = "2012-10-17",
-    "Statement" = [
+    "Version": "2012-10-17",
+    "Statement": [
       {
-        "Sid" = "AllowCWAndGlueAccess",
-        "Effect" = "Allow",
-        "Action" = [
+        "Sid": "AllowCWAndGlueAccess",
+        "Effect": "Allow",
+        "Action": [
           "logs:CreateLogDelivery",
           "logs:CreateLogStream",
           "logs:GetLogDelivery",
@@ -233,12 +233,12 @@ resource "aws_iam_policy" "stepfunction_invoke_gluejob_policy" {
           "glue:GetJobRuns",
           "glue:BatchStopJobRun"
         ],
-        "Resource" = "*"
+        "Resource": "*"
       },
       {
-        "Sid" = "AllowEventBridgeAccess",
-        "Effect" = "Allow",
-        "Action" = [
+        "Sid": "AllowEventBridgeAccess",
+        "Effect": "Allow",
+        "Action": [
           "events:PutTargets",
           "events:PutRule",
           "events:DescribeRule",
@@ -249,15 +249,14 @@ resource "aws_iam_policy" "stepfunction_invoke_gluejob_policy" {
         ]
       },
       {
-        "Sid" = "AllowStateMachineAccess",
-        "Effect" = "Allow",
-        "Action" = [
+        "Sid": "AllowStateMachineAccess",
+        "Effect": "Allow",
+        "Action": [
           "states:StartExecution",
           "states:DescribeExecution",
           "states:StopExecution"
         ],
-        "Resource" = [
-          # "arn:aws:states:${var.region}:${var.aws_account_id}:stateMachine:ddsl-sfn-state-machine-developer",
+        "Resource": [
           "arn:aws:states:${var.region}:${var.aws_account_id}:stateMachine:ddsl*"
         ]
       }
@@ -293,7 +292,7 @@ resource "aws_iam_role" "glue_role" {
   })
 }
 
-#AWS Glue -IAM Glue policy
+# AWS Glue - IAM Glue policy with specific S3 permissions for dynamic folder creation
 resource "aws_iam_policy" "ddsl_glue_job_policy" {
   name = "ddsl-glue-${var.environment}-policy"
 
@@ -343,8 +342,9 @@ resource "aws_iam_policy" "ddsl_glue_job_policy" {
           "s3:PutObject",
           "s3:ListBucket",
           "s3:List*",
-          "s3:*Object*",
-          "s3:Get*",
+          "s3:CreateBucket",         # Allows bucket creation if necessary
+          "s3:PutObjectAcl",         # Allows modifying ACLs
+          "s3:DeleteObject",
           "s3:CopyObject"
         ],
         "Resource": [
@@ -399,6 +399,7 @@ resource "aws_iam_role" "iam_for_msk" {
     ]
   })
 }
+
 
 resource "aws_iam_role_policy_attachment" "msk_policy_attachment" {
   role       = aws_iam_role.iam_for_msk.name
