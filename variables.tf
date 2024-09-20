@@ -120,3 +120,12 @@ variable "environment" {
   description = "The environment for the resources"
 }
 
+variable "src_data_bkt" {
+  description = "Source data bucket"
+  default     = "ddsl-raw-developer"
+}
+
+variable "config_file" {
+  description = "Path to the config file in S3"
+  default     = "job_config/config.json"
+}

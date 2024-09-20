@@ -1,7 +1,7 @@
 import logging
 import json
 import boto3
-from urllib.parse import urlparse
+import botocore
 from awsglue.transforms import *
 from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
@@ -12,28 +12,28 @@ from pyspark.sql.functions import *
 from datetime import datetime
 import sys
 from functools import reduce
+from botocore.exceptions import NoCredentialsError
+from urllib.parse import urlparse
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Function to read JSON configuration from S3
 def read_config_from_s3(bucket_name, file_key):
     s3_client = boto3.client('s3')
     try:
+        logger.info(f"Reading configuration from s3://{bucket_name}/{file_key}")
         response = s3_client.get_object(Bucket=bucket_name, Key=file_key)
         config_content = response['Body'].read().decode('utf-8')
-        logger.info(f"Configuration content: {config_content}")
         config = json.loads(config_content)
         logger.info("Configuration loaded successfully from S3.")
         return config
     except json.JSONDecodeError as e:
         logger.error(f"JSON decoding error: {e}", exc_info=True)
-        raise
+        sys.exit(1)
     except Exception as e:
         logger.error(f"Error reading config from S3: {e}", exc_info=True)
-        raise
+        sys.exit(1)
 
-# Hudi options generator
 def get_hudi_options(table_name, database_name, primary_keys, precombine_field):
     return {
         'hoodie.table.name': table_name,
@@ -42,7 +42,7 @@ def get_hudi_options(table_name, database_name, primary_keys, precombine_field):
         'hoodie.datasource.write.operation': 'upsert',
         'hoodie.datasource.write.table.name': table_name,
         'hoodie.datasource.write.table.type': 'COPY_ON_WRITE',
-        'hoodie.datasource.write.partitionpath.field': "dt",
+        'hoodie.datasource.write.partitionpath.field': 'dt', 
         'hoodie.datasource.hive_sync.enable': 'true',
         'hoodie.datasource.hive_sync.database': database_name,
         'hoodie.datasource.hive_sync.table': table_name,
@@ -57,7 +57,6 @@ def get_hudi_options(table_name, database_name, primary_keys, precombine_field):
         'hoodie.datasource.write.schema.evolution': 'true'
     }
 
-# Check if Hudi table exists
 def hudi_table_exists(spark, path: str) -> bool:
     try:
         hudi_df = spark.read.format("hudi").load(path)
@@ -68,7 +67,6 @@ def hudi_table_exists(spark, path: str) -> bool:
         logger.error(f"Error checking Hudi table existence at {path}: {e}")
         return False
 
-# Clean up column names
 def clean_column_names(df):
     try:
         new_columns = [col_name.strip().replace(" ", "_").replace("(", "").replace(")", "").replace("-", "_").lower() for col_name in df.columns]
@@ -77,92 +75,139 @@ def clean_column_names(df):
         logger.info(f"Renamed columns: {dict(zip(df.columns, new_columns))}")
         return df
     except Exception as e:
-        logger.error(f"Error cleaning column names: {e}", exc_info=True)
-        raise
+        logger.error(f"Error cleaning column names: {e}")
+        sys.exit(1)
 
-# Write to Hudi table
+def get_old_records(src_df, dest_df, joining_key):
+    try:
+        logger.info(f"Joining on key: {joining_key}")
+        old_recs_df = src_df.join(dest_df, joining_key, 'inner').select(*dest_df.columns)
+        updated_old_recs_df = old_recs_df.withColumn("record_end_date", to_date(lit("9999-12-31"), "yyyy-MM-dd")) \
+                                        .withColumn("current_record_flag", lit(0)) \
+                                        .withColumn("dt", current_date())
+        logger.info("Old records updated successfully.")
+        return updated_old_recs_df
+    except Exception as e:
+        logger.error(f"Error getting old records: {e}")
+        sys.exit(1)
+
+def create_insert_df(df, batch_date, delete_indicator_column):
+    try:
+        insert_df = df.withColumn("record_start_date", to_date(col(batch_date), "yyyy-MM-dd")) \
+                      .withColumn("record_end_date", to_date(lit("9999-12-31"), "yyyy-MM-dd")) \
+                      .withColumn("current_record_flag", lit(1)) \
+                      .withColumn("dt", current_date())
+        if delete_indicator_column:
+            insert_df = insert_df.withColumn(
+                "delete_flag",
+                when(col(delete_indicator_column) == lit('D'), lit(1))
+                .otherwise(lit(0))
+            )
+        else:
+            insert_df = insert_df.withColumn("delete_flag", lit(0))
+        
+        logger.info("Insert DataFrame created successfully.")
+        return insert_df
+    except Exception as e:
+        logger.error(f"Error creating insert DataFrame: {e}", exc_info=True)
+        sys.exit(1)
+
 def write_to_hudi(data_df, hudi_path, hudi_options):
     try:
         data_df.write.format("hudi").options(**hudi_options).mode("append").save(hudi_path)
         logger.info(f"Successfully updated the Hudi table at {hudi_path}")
     except Exception as e:
-        logger.error(f"Error during Hudi table update at {hudi_path}: {e}", exc_info=True)
-        raise
+        logger.error(f"Error during Hudi table update at {hudi_path}: {e}")
+        sys.exit(1)
 
-# Read S3 JSON file
+def load_hudi_table_data(glueContext, database_name, table_name):
+    try:
+        dynamic_frame = glueContext.create_dynamic_frame.from_catalog(
+            database=database_name,
+            table_name=table_name
+        )
+        dynamic_frame = dynamic_frame.toDF()
+        logger.info("Loaded and converted DynamicFrame from Glue Catalog.")
+        return dynamic_frame
+    except Exception as e:
+        logger.error(f"Error loading data from Glue catalog: {e}")
+        sys.exit(1)
+
 def read_s3_json(bucket, key):
     s3 = boto3.client('s3')
     try:
         obj = s3.get_object(Bucket=bucket, Key=key)
         data = obj['Body'].read().decode('utf-8')
         return json.loads(data)
+    except NoCredentialsError:
+        raise RuntimeError("AWS credentials not found. Please configure your AWS credentials.")
     except Exception as e:
-        logger.error(f"Error reading S3 file: {e}", exc_info=True)
-        raise
+        raise RuntimeError(f"Error reading S3 file: {e}")
 
-# Check if S3 directory exists
 def check_s3_directory_exists(bucket: str, prefix: str) -> bool:
     s3_client = boto3.client('s3')
     response = s3_client.list_objects_v2(Bucket=bucket, Prefix=prefix, Delimiter='/')
     return 'Contents' in response or 'CommonPrefixes' in response
 
-# Process record type
-def process_rec_type(spark, rec_type, rec_type_config, transpose_history_hudi_table_path, src_data_bkt):
+def process_rec_type(spark, rec_type, glueContext, rec_type_config, parquet_file_path, hudi_table_path, src_data_bkt):
     logger.info(f"Processing record type: {rec_type}")
     primary_keys = rec_type_config.get("primary_keys", [])
+    joining_key = rec_type_config.get("joining_key", [])
+    table_name = f"{rec_type}"
     database_name = rec_type_config.get("database_name", "")
     precombine_field = rec_type_config.get("Batch_date", "")
-    source_path = f's3://{src_data_bkt}/{rec_type_config.get("source_path", "")}'
-    
-    history_table_name = "transpose_history_" + rec_type
-    history_hudi_options = get_hudi_options(history_table_name, database_name, primary_keys, precombine_field)
+    source_path = f's3://{src_data_bkt}/{rec_type_config.get("source_path", "")}' 
+    batch_date = rec_type_config.get("Batch_date", "")
+    delete_indicator_column = rec_type_config.get("Delete_indicator_column", "")
+    hudi_options = get_hudi_options(table_name, database_name, primary_keys, precombine_field)
 
-    if check_s3_directory_exists(src_data_bkt, rec_type_config.get("source_path", "")):
-        org_parquet_df = spark.read.format("parquet").load(source_path)
-        org_parquet_df = org_parquet_df.drop("DataQualityRulesPass", "DataQualityRulesFail", "DataQualityRulesSkip", "DataQualityEvaluationResult")
-        cleaned_df = clean_column_names(org_parquet_df)
-        cleaned_df = cleaned_df.withColumn("dt", current_date())
-
-        if hudi_table_exists(spark, transpose_history_hudi_table_path):
-            logger.info("Appending records to existing Hudi table.")
+    try:
+        if check_s3_directory_exists(src_data_bkt, rec_type_config.get("source_path", "")):
+            org_parquet_df = spark.read.format("parquet").load(source_path)
+            org_parquet_df = org_parquet_df.drop("DataQualityRulesPass", "DataQualityRulesFail", "DataQualityRulesSkip", "DataQualityEvaluationResult")
+            org_parquet_df = clean_column_names(org_parquet_df)
+            src_insert_df = create_insert_df(org_parquet_df, batch_date, delete_indicator_column)
+            src_insert_df = src_insert_df.select([col(c).alias(c.lower()) for c in src_insert_df.columns])
+            if hudi_table_exists(spark, hudi_table_path):
+                latest_hudi_df = spark.read.format("hudi").load(hudi_table_path).filter((col('current_record_flag') == 1) & (col('delete_flag') == 0)).select(*src_insert_df.columns)
+                old_records_update_df = get_old_records(src_insert_df, latest_hudi_df, joining_key)
+                write_to_hudi(old_records_update_df, hudi_table_path, hudi_options)
+                write_to_hudi(src_insert_df, hudi_table_path, hudi_options)
+            else:
+                write_to_hudi(src_insert_df, hudi_table_path, hudi_options)
         else:
-            logger.info("Creating a new Hudi table.")
+            logger.error(f"S3 directory does not exist: {src_data_bkt}/{rec_type_config.get('source_path', '')}")
+            raise RuntimeError(f"S3 directory does not exist: {src_data_bkt}/{rec_type_config.get('source_path', '')}")
+    except Exception as e:
+        logger.error(f"Error processing record type {rec_type}: {e}")
+        sys.exit(1)
 
-        write_to_hudi(cleaned_df, transpose_history_hudi_table_path, history_hudi_options)
-    else:
-        logger.error(f"Source path {rec_type_config.get('source_path', '')} does not exist in bucket {src_data_bkt}.")
-
-# Main function
 def main():
+    args = getResolvedOptions(sys.argv, ['JOB_NAME', 'src_data_bkt', 'rec_type', 'config_file'])
+    job_name = args['JOB_NAME']
+    src_data_bkt = args['src_data_bkt']
+    rec_type = args['rec_type']
+    config_file = args['config_file']
+
+    logger.info(f"Job name: {job_name}")
+    logger.info(f"Source data bucket: {src_data_bkt}")
+    logger.info(f"Record type: {rec_type}")
+    logger.info(f"Configuration file: {config_file}")
+
     sc = SparkContext()
     glueContext = GlueContext(sc)
     spark = glueContext.spark_session
     job = Job(glueContext)
-    args = getResolvedOptions(sys.argv, ['rec_type', 'env'])
-    rec_type = args['rec_type']
-    env = args['env']
+    job.init(job_name, args)
 
-    raw_bkt = 'ddsl-raw-developer' if env == 'dev' else 'ddsl-raw-dev1'
-    
-    bkt_params = read_s3_json(raw_bkt, 'job_config/bucket_config.json')
-    parquet_file_path = f"s3://{bkt_params[env]['DQ_DATA_BKT']}/batch_dq_recordlevel/accounting/pass/{rec_type}/"
-    transpose_history_hudi_table_path = f"s3://{bkt_params[env]['DQ_DATA_BKT']}/ddsl-transpose-history-hudi/{rec_type}/"
+    config = read_config_from_s3(src_data_bkt, config_file)
+    rec_type_config = config.get(rec_type, {})
+    parquet_file_path = f"s3://{src_data_bkt}/{rec_type_config.get('source_path', '')}"
+    hudi_table_path = f"s3://{rec_type_config.get('hudi_table_path', '')}"
 
-    config = read_config_from_s3(bkt_params[env]['RAW_DATA_BKT'], 'job_config/transpose_config.json')
+    process_rec_type(spark, rec_type, glueContext, rec_type_config, parquet_file_path, hudi_table_path, src_data_bkt)
 
-    try:
-        logger.info("Starting the ETL job")
-        rec_type_param = config[rec_type]
-        process_rec_type(spark, rec_type, rec_type_param, transpose_history_hudi_table_path, bkt_params[env]['DQ_DATA_BKT'])
-        logger.info("ETL job completed successfully")
-    except KeyError as e:
-        logger.error(f"Configuration for record type '{rec_type}' not found: {e}", exc_info=True)
-        sys.exit(1)
-    except Exception as e:
-        logger.error(f"Unexpected error during ETL job: {e}", exc_info=True)
-        sys.exit(1)
-    finally:
-        job.commit()
+    job.commit()
 
 if __name__ == "__main__":
     main()
