@@ -49,11 +49,11 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
                     },
                     "Next": "History updates for 9000"
                   },
-                  "History updates for 9000": {
+                  "load updates for 9000": {
                     "Type": "Task",
                     "Resource": "arn:aws:states:::glue:startJobRun.sync",
                     "Parameters": {
-                      "JobName": "${aws_glue_job.data_history.name}",
+                      "JobName": "${aws_glue_job.data_update.name}",
                       "Arguments": {
                         "--rec_type": "rec_type_9000",
                         "--env": "dev",
@@ -85,7 +85,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
                     "Type": "Task",
                     "Resource": "arn:aws:states:::glue:startJobRun.sync",
                     "Parameters": {
-                      "JobName": "${aws_glue_job.data_history.name}",
+                      "JobName": "${aws_glue_job.data_update.name}",
                       "Arguments": {
                         "--rec_type": "rec_type_9002",
                         "--env": "dev",
@@ -117,7 +117,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
                     "Type": "Task",
                     "Resource": "arn:aws:states:::glue:startJobRun.sync",
                     "Parameters": {
-                      "JobName": "${aws_glue_job.data_history.name}",
+                      "JobName": "${aws_glue_job.data_update.name}",
                       "Arguments": {
                         "--rec_type": "rec_type_9004",
                         "--env": "dev",
@@ -149,7 +149,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
                     "Type": "Task",
                     "Resource": "arn:aws:states:::glue:startJobRun.sync",
                     "Parameters": {
-                      "JobName": "${aws_glue_job.data_history.name}",
+                      "JobName": "${aws_glue_job.data_load.name}",
                       "Arguments": {
                         "--rec_type": "rec_type_9005",
                         "--env": "dev",
@@ -176,7 +176,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
                     "Type": "Task",
                     "Resource": "arn:aws:states:::glue:startJobRun.sync",
                     "Parameters": {
-                      "JobName": "${aws_glue_job.data_history.name}",
+                      "JobName": "${aws_glue_job.data_update.name}",
                       "Arguments": {
                         "--rec_type": "rec_type_9005",
                         "--env": "dev",
@@ -208,7 +208,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
                     "Type": "Task",
                     "Resource": "arn:aws:states:::glue:startJobRun.sync",
                     "Parameters": {
-                      "JobName": "${aws_glue_job.data_history.name}",
+                      "JobName": "${aws_glue_job.data_update.name}",
                       "Arguments": {
                         "--rec_type": "rec_type_9006",
                         "--env": "dev",
@@ -240,7 +240,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
                     "Type": "Task",
                     "Resource": "arn:aws:states:::glue:startJobRun.sync",
                     "Parameters": {
-                      "JobName": "${aws_glue_job.data_history.name}",
+                      "JobName": "${aws_glue_job.data_update.name}",
                       "Arguments": {
                         "--rec_type": "rec_type_9009",
                         "--env": "dev",
@@ -272,7 +272,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
                     "Type": "Task",
                     "Resource": "arn:aws:states:::glue:startJobRun.sync",
                     "Parameters": {
-                      "JobName": "${aws_glue_job.data_history.name}",
+                      "JobName": "${aws_glue_job.data_update.name}",
                       "Arguments": {
                         "--rec_type": "rec_type_9012",
                         "--env": "dev",
@@ -304,7 +304,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
                     "Type": "Task",
                     "Resource": "arn:aws:states:::glue:startJobRun.sync",
                     "Parameters": {
-                      "JobName": "${aws_glue_job.data_history.name}",
+                      "JobName": "${aws_glue_job.data_load.name}",
                       "Arguments": {
                         "--rec_type": "rec_type_9019",
                         "--env": "dev",
@@ -331,7 +331,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
                     "Type": "Task",
                     "Resource": "arn:aws:states:::glue:startJobRun.sync",
                     "Parameters": {
-                      "JobName": "${aws_glue_job.data_history.name}",
+                      "JobName": "${aws_glue_job.data_update.name}",
                       "Arguments": {
                         "--rec_type": "rec_type_9019",
                         "--env": "dev",
@@ -363,7 +363,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
                     "Type": "Task",
                     "Resource": "arn:aws:states:::glue:startJobRun.sync",
                     "Parameters": {
-                      "JobName": "${aws_glue_job.data_history.name}",
+                      "JobName": "${aws_glue_job.data_update.name}",
                       "Arguments": {
                         "--rec_type": "rec_type_9020",
                         "--env": "dev",
@@ -395,7 +395,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
                     "Type": "Task",
                     "Resource": "arn:aws:states:::glue:startJobRun.sync",
                     "Parameters": {
-                      "JobName": "${aws_glue_job.data_history.name}",
+                      "JobName": "${aws_glue_job.data_update.name}",
                       "Arguments": {
                         "--rec_type": "rec_type_9031",
                         "--env": "dev",

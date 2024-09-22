@@ -78,7 +78,7 @@ resource "aws_glue_job" "data_quality2" {
 }
 
 # AWS Glue job for a Py script
-resource "aws_glue_job" "data_history" {
+resource "aws_glue_job" "data_load" {
   name          = "History_Load-dev"
   role_arn      = aws_iam_role.glue_role.arn
   glue_version   = "4.0"

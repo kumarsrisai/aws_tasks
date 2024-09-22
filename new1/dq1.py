@@ -3,14 +3,10 @@ import os
 import sys
 from awsglue.context import GlueContext
 from pyspark.context import SparkContext
-from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType
-import botocore
-import logging
 from awsglue.utils import getResolvedOptions
 from botocore.exceptions import NoCredentialsError
 import json
-from urllib.parse import urlparse
 from datetime import datetime
 
 # Initialize Spark and Glue contexts
@@ -54,17 +50,20 @@ bkt_params = read_s3_json(raw_bkt, config_file)
 input_bucket = bkt_params[env]['SPLITTED_DATA_BKT']
 output_bucket = bkt_params[env]['DQ_DATA_BKT']
 
-# Function to move file to another folder in S3
-def move_file(source_key, status):
-    # Get current date for folder structure
+# Function to save file to S3 with status
+def save_file_with_status(source_key, status):
     current_date = datetime.now().strftime("%Y/%m/%d/%H")
     destination_folder = f'batch_dq_checksum/accounting/{status}/{current_date}'
+    destination_key = f'{destination_folder}/{os.path.basename(source_key)}'
+    
+    # Copy the source file to the new destination with status
     s3.copy_object(
         Bucket=output_bucket,
         CopySource={'Bucket': input_bucket, 'Key': source_key},
-        Key=f'{destination_folder}/{os.path.basename(source_key)}'
+        Key=destination_key
     )
-    s3.delete_object(Bucket=input_bucket, Key=source_key)
+    # Optionally delete the original file if needed
+    # s3.delete_object(Bucket=input_bucket, Key=source_key)
 
 # Define schema for the CSV file
 schema = StructType([
@@ -93,7 +92,7 @@ for obj in response.get('Contents', []):
     # Ensure the DataFrame has data
     if df.count() == 0:
         print(f"No data found in file {file_name}")
-        move_file(file_key, fail_status)
+        save_file_with_status(file_key, fail_status)
         continue
 
     # Get the last row for reference row count
@@ -105,15 +104,15 @@ for obj in response.get('Contents', []):
                 reference_row_count = int(last_row_values[-1])  # Convert to int
             except (ValueError, TypeError) as e:
                 print(f"Error converting reference row count to int for file {file_name}: {e}")
-                move_file(file_key, fail_status)
+                save_file_with_status(file_key, fail_status)
                 continue
         else:
             print(f"Reference row count not found in file {file_name}")
-            move_file(file_key, fail_status)
+            save_file_with_status(file_key, fail_status)
             continue
     else:
         print(f"No last row found in file {file_name}")
-        move_file(file_key, fail_status)
+        save_file_with_status(file_key, fail_status)
         continue
 
     # Count actual rows in the DataFrame
@@ -122,7 +121,7 @@ for obj in response.get('Contents', []):
     # Compare row counts
     if actual_row_count != reference_row_count:
         print(f"Row count mismatch for file {file_name}: Actual: {actual_row_count}, Reference: {reference_row_count}")
-        move_file(file_key, fail_status)  # Move to 'fail' folder if counts don't match
+        save_file_with_status(file_key, fail_status)  # Save to 'fail' folder if counts don't match
     else:
         print(f"Row count match for file {file_name}: {actual_row_count}")
-        move_file(file_key, pass_status)  # Move to 'pass' folder if counts match
+        save_file_with_status(file_key, pass_status)  # Save to 'pass' folder if counts match
