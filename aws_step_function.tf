@@ -49,7 +49,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
                     },
                     "Next": "History updates for 9000"
                   },
-                  "load updates for 9000": {
+                  "History updates for 9000": {
                     "Type": "Task",
                     "Resource": "arn:aws:states:::glue:startJobRun.sync",
                     "Parameters": {
