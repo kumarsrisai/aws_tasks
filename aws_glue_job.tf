@@ -27,7 +27,7 @@ resource "aws_glue_job" "segregate" {
 
 # AWS Glue job for a Py script
 resource "aws_glue_job" "data_quality1" {
-  name          = "Data-Quality_File_Level_Check-dev"
+  name          = "Data-Quality_File_Level_Check_dev"
   role_arn      = aws_iam_role.glue_role.arn
   max_capacity   = 1.0
   glue_version   = "4.0"
@@ -53,7 +53,7 @@ resource "aws_glue_job" "data_quality1" {
 
 # AWS Glue job for a Py script
 resource "aws_glue_job" "data_quality2" {
-  name          = "Record_Level_DQ-dev"
+  name          = "Record_Level_DQ_dev"
   role_arn      = aws_iam_role.glue_role.arn
   max_capacity   = 1.0
   glue_version   = "4.0"
@@ -79,7 +79,7 @@ resource "aws_glue_job" "data_quality2" {
 
 # AWS Glue job for a Py script
 resource "aws_glue_job" "data_load" {
-  name          = "History_Load-dev"
+  name          = "History_Load_dev"
   role_arn      = aws_iam_role.glue_role.arn
   glue_version   = "4.0"
   number_of_workers = 2
@@ -112,7 +112,7 @@ resource "aws_glue_job" "data_load" {
 
 # AWS Glue job for a Py script
 resource "aws_glue_job" "data_update" {
-  name          = "History_Update-dev"
+  name          = "History_Update_dev"
   role_arn      = aws_iam_role.glue_role.arn
   glue_version   = "4.0"
   number_of_workers = 2
