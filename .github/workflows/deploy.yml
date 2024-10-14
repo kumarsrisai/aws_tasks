@@ -1,4 +1,4 @@
-name: Configure AWS Credentials and Deploy S3 Resources
+name: Configure AWS Credentials and Deploy Billing Alerts
 
 on:
   push:
@@ -34,12 +34,13 @@ jobs:
 
       - name: Terraform Validate    
         run: terraform validate
-        
+
       - name: Terraform Plan
         run: terraform plan 
 
-      - name: Terraform Apply -auto-approve
+      - name: Terraform Apply
         run: terraform apply -auto-approve
 
+      # Optional - If you want to automatically destroy the resources after the workflow runs, uncomment the next block
       # - name: Terraform Destroy -auto-approve
       #   run: terraform destroy -auto-approve
